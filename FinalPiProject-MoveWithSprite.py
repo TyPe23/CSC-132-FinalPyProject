@@ -38,21 +38,21 @@ while running == True:
 		if event.type == pygame.QUIT:
 			running = False
 
-        #get the position of the mouse
-        mouse_pos = pygame.mouse.get_pos()
+        	#get the position of the mouse
+        	mouse_pos = pygame.mouse.get_pos()
 
-	    #check if the mouse has been pressed or not
-        click = pygame.mouse.get_pressed()
+	    	#check if the mouse has been pressed or not
+        	click = pygame.mouse.get_pressed()
 
 		#if your mouse is over the up_rect and the left side of the mouse is clicked
-     	if up_rect.collidepoint(mouse_pos) and click[0] == 1:
+     		if up_rect.collidepoint(mouse_pos) and click[0] == 1:
 			direction = "up"
 
 		#if your mouse is over the down_rect and the left side of the mouse is clicked	
-        elif down_rect.collidepoint(mouse_pos) and click[0] == 1:
+        	elif down_rect.collidepoint(mouse_pos) and click[0] == 1:
 			direction = "down"
 
-        else:
+        	else:
 			direction = "stop"
 
 	#if the direction is up, move the y position up
