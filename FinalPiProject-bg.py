@@ -22,7 +22,7 @@ class Button(pygame.sprite.Sprite):
 
 class StartButton(Button):
         def __init__(self, sprite):
-                Button.__init__(self, points = None, width = 300, height = 100, x = 300, y = 300)
+                Button.__init__(self, points = None, width = WIDTH / 2, height = HEIGHT / 8, x = WIDTH / 4, y = HEIGHT / 3)
                 self.sprite = sprite
                 self.image.fill(BLUE)
 
@@ -31,14 +31,14 @@ class StartButton(Button):
 
                 mouse_pos = pygame.mouse.get_pos()
 
-                if self.rect.collidepoint(mouse_pos):
+                if (self.rect.collidepoint(mouse_pos)):
                         screen.blit(selectedStartButtonImg, self.rect) 
 
         def clicked(self):
                 mouse_pos = pygame.mouse.get_pos()
                 click = pygame.mouse.get_pressed()
 
-                if self.rect.collidepoint(mouse_pos) and click[0] == 1:
+                if (self.rect.collidepoint(mouse_pos) and click[0] == 1):
                         return True
 
                 else:
@@ -57,51 +57,75 @@ class Player(pygame.sprite.Sprite):
                 self.rect.y = y
 
         def update(self, screen):
+                global right
+                global left
+                global rightImg
+                global leftImg
+                global upImg
+                global downImg
 
-                if self.rect.bottom > HEIGHT - 30:
+                if (self.rect.bottom > HEIGHT - 30):
                         self.rect.y -= 6
 
                 #creating all the buttons 
-                upButton = Button([(590, 720), (610, 690), (630, 720)], 40, 30, 590, 690)
-                rightButton = Button([(635, 730), (665, 750), (635, 770)], 30, 40, 635, 730)
-                downButton = Button([(630, 780), (610, 810), (590, 780)], 40, 30, 590, 780)
-                leftButton = Button([(582, 730), (552, 750), (582, 770)], 30, 40, 552, 730)
+                downButton = Button([(stickW - 20, stickH + 30), (stickW, stickH + 70), (stickW + 20, stickH + 30)], 40, 0, stickW, stickH + 20)
+                rightButton = Button([(stickW + 70, stickH), (stickW + 30, stickH - 20), (stickW + 30, stickH + 20)], 0, 40, stickW + 25, stickH)
+                upButton = Button([(stickW - 20, stickH - 30), (stickW, stickH - 70), (stickW + 20, stickH - 30)], 40, 0, stickW, stickH - 20)
+                leftButton = Button([(stickW - 70, stickH), (stickW - 30, stickH - 20), (stickW - 30, stickH + 20)], 0, 40, stickW - 20, stickH)
 
-                buttonList = [upButton, rightButton, downButton, leftButton]
-
-                for button in buttonList:
-
-                        if not pygame.sprite.collide_rect(button, joystick):
-                                pygame.draw.polygon(screen, BLUE, button.points, 0)
+                if (not pygame.sprite.collide_rect(joystick, rightButton)):
+                        rightImg = pygame.image.load("sprites/RightArrow.png")
                         
-                        else:
-                                pygame.draw.polygon(screen, LIGHTBLUE, button.points, 0)
+                else:
+                        rightImg = pygame.image.load("sprites/RightArrow.png")
 
-                if pygame.sprite.collide_rect(upButton, joystick):
-                        self.rect.y -= 9
+                if (not pygame.sprite.collide_rect(leftButton, joystick)):
+                        leftImg = pygame.image.load("sprites/LeftArrow.png")
+                else:
+                        leftImg = pygame.image.load("sprites/LeftArrow.png")
+                        
+                if (not pygame.sprite.collide_rect(upButton, joystick)):
+                        upImg = pygame.image.load("sprites/UpArrow.png")       
+                else:
+                        upImg = pygame.image.load("sprites/UpArrow.png")
+                        
+                if (not pygame.sprite.collide_rect(downButton, joystick)):
+                        downImg = pygame.image.load("sprites/DownArrow.png")
+                else:
+                        downImg = pygame.image.load("sprites/DownArrow.png")
 
-                if pygame.sprite.collide_rect(rightButton, joystick):
-                        self.rect.x += 9
 
-                if pygame.sprite.collide_rect(downButton, joystick):
-                        self.rect.y += 9                        
+                if (pygame.sprite.collide_rect(upButton, joystick)):
+                        self.rect.y -= 6
 
-                if pygame.sprite.collide_rect(leftButton, joystick):
-                        self.rect.x -= 9        
+                elif (pygame.sprite.collide_rect(rightButton, joystick) and left == False):
+                        self.rect.x += 6
+                        right = True
+
+                elif (pygame.sprite.collide_rect(downButton, joystick)):
+                        self.rect.y += 6                       
+
+                elif (pygame.sprite.collide_rect(leftButton, joystick) and right == False):
+                        self.rect.x -= 6
+                        left = True
+
+                else:
+                        right = False
+                        left = False
         
 
         #function that creates a bullet object 
         def shoot(self):
-                if self.rect.bottom <= HEIGHT - 30:
-                        bullet1 = Bullet(self.rect.centerx, self.rect.top, 10, 20, 1, -11)
-                        bullet2 = Bullet(self.rect.centerx, self.rect.top, 10, 20, -1, -11)
+                if (self.rect.bottom <= HEIGHT - 30):
+                        bullet1 = Bullet(self.rect.centerx + 45, self.rect.top, 12, 14, 1, -11)
+                        bullet2 = Bullet(self.rect.centerx, self.rect.top, 12, 14, -1, -11)
                         bullets.add(bullet1, bullet2)
 
 
 class Bullet(pygame.sprite.Sprite):
         def __init__(self, x, y, width, height, vx, vy):
                 pygame.sprite.Sprite.__init__(self)
-                self.image = pygame.Surface((width, height)).convert_alpha()
+                self.image = pygame.image.load('sprites/Bullets.png')
                 self.rect = self.image.get_rect()
                 self.rect.x = x
                 self.rect.y = y
@@ -114,7 +138,7 @@ class Bullet(pygame.sprite.Sprite):
                 screen.blit(bulletImg, self.rect)
 
                 #if it goes off the screen then kill it
-                if self.rect.bottom < 0:
+                if (self.rect.bottom < 0):
                         self.kill()
                 
                 #make it shoot upwards
@@ -122,7 +146,7 @@ class Bullet(pygame.sprite.Sprite):
                 self.rect.y += self.y_speed
 
 
-#class that creates the circle inside the joypad
+#class that creates the circle inside the d-pad
 class Circle(pygame.sprite.Sprite):
         def __init__(self, x, y, color, radius):
                 pygame.sprite.Sprite.__init__(self)
@@ -143,10 +167,10 @@ class Circle(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-        def __init__(self, sprite, hp, x_speed, y_speed):
+        def __init__(self, sprite, hp, x_speed, y_speed, image):
                 pygame.sprite.Sprite.__init__(self)
                 self.sprite = sprite
-                self.image = pygame.Surface((128, 128)).convert_alpha()
+                self.image = image
                 self.image.fill((255, 255, 255, 0))
                 self.rect = self.image.get_rect()
                 self.rect.centerx = random.randint(0 + self.rect.width, WIDTH - self.rect.width)
@@ -166,15 +190,15 @@ class Enemy(pygame.sprite.Sprite):
 
         def checkCollision(self):
                 for bullet in bullets:
-                        if pygame.sprite.collide_rect(self, bullet):
-                                if self.hp > 0:
+                        if (pygame.sprite.collide_rect(self, bullet)):
+                                if (self.hp > 0):
                                         self.hp -= 1
                                 else:
                                         self.kill()
                                 bullet.kill()
 
         def alive(self):
-                if self.hp > 0:
+                if (self.hp > 0):
                         return True
                 else:
                         return False
@@ -188,11 +212,11 @@ class Enemy(pygame.sprite.Sprite):
 
 class NormalEnemy(Enemy):
         def __init__(self, sprite, hp, x_speed, y_speed):
-                Enemy.__init__(self, sprite, hp, x_speed, y_speed)
+                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((128, 128)).convert_alpha())
                 self.sprite = sprite
                 self.hp = hp
-                self.x_speed = x_speed if x_speed > 2 or x_speed < -2 else 3
-                self.y_speed = y_speed if x_speed > 2 or x_speed < -2 else 3
+                self.x_speed = x_speed if (x_speed > 2 or x_speed < -2) else 3
+                self.y_speed = y_speed if (x_speed > 2 or x_speed < -2) else 3
                 self.xdirection = 1
                 self.ydirection = 1
                 self.enemyBullets = pygame.sprite.Group()
@@ -207,7 +231,7 @@ class NormalEnemy(Enemy):
                 screen.blit(normal[0], self.rect) 
                 self.checkCollision()
 
-                if self.rect.top < 0:
+                if (self.rect.top < 0):
                         self.rect.y += 6
 
                 else:
@@ -216,23 +240,23 @@ class NormalEnemy(Enemy):
                         self.rect.x += self.x_speed * self.xdirection
                         self.rect.y += self.y_speed * self.ydirection
 
-                        if (self.rect.left <= 0) or (self.rect.left + self.rect.width >= WIDTH):
+                        if ((self.rect.left <= 0) or (self.rect.left + self.rect.width >= WIDTH)):
                                 self.xdirection *= -1
                                 self.y_speed = random.uniform(3, 6)
 
-                        if (self.rect.bottom > 450) or (self.rect.top <= 0): 
+                        if ((self.rect.bottom > 450) or (self.rect.top <= 0)): 
                                 self.ydirection *= -1
                                 self.x_speed = random.uniform(3, 6)
                 
         def shoot(self):
-                if random.randrange(15) == 0:
+                if (random.randrange(15) == 0):
                         enemyBullet = Bullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, 0, 9)
                         self.enemyBullets.add(enemyBullet)
 
 
 class SplashEnemy(Enemy):
         def __init__(self, sprite, hp, x_speed, y_speed):
-                Enemy.__init__(self, sprite, hp, x_speed, y_speed)
+                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((72, 60)).convert_alpha())
                 self.sprite = sprite
                 self.hp = hp
                 self.x_speed = x_speed
@@ -244,10 +268,10 @@ class SplashEnemy(Enemy):
                 self.enemyBullets.draw(screen)
                 self.enemyBullets.update(screen, bulletImg)
 
-                screen.blit(spray[0], self.rect) 
+                screen.blit(spray[count // 6], self.rect) 
                 self.checkCollision()
 
-                if self.rect.bottom < 400:
+                if (self.rect.bottom < 400):
                         self.rect.y += self.y_speed
 
                 else:
@@ -255,8 +279,8 @@ class SplashEnemy(Enemy):
                         self.shoot()
 
         def shoot(self):
-                        enemyBullet1 = Bullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
-                        enemyBullet2 = Bullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, random.randint(-2, -0), random.uniform(3.5, 7.5))
+                        enemyBullet1 = Bullet(self.rect.centerx + 23, self.rect.top + self.rect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
+                        enemyBullet2 = Bullet(self.rect.centerx - 35, self.rect.top + self.rect.height, 10, 20, random.randint(-2, -0), random.uniform(3.5, 7.5))
                         self.enemyBullets.add(enemyBullet1, enemyBullet2)
 
 
@@ -267,7 +291,7 @@ class EvadingEnemy(Enemy):
         rightMove = False
 
         def __init__(self, sprite, hp, x_speed, y_speed, player):       
-                Enemy.__init__(self, sprite, hp, x_speed, y_speed)
+                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((128, 128)).convert_alpha())
                 self.sprite = sprite
                 self.hp = 10
                 self.x_speed = x_speed
@@ -280,25 +304,25 @@ class EvadingEnemy(Enemy):
 
                 self.offScreen()
 
-                if self.rect.top < 300:
+                if (self.rect.top < 300):
                         self.rect.y += 12
 
                 else:
-                        if EvadingEnemy.edge == False and EvadingEnemy.leftMove == False and EvadingEnemy.rightMove == False:
+                        if (EvadingEnemy.edge == False and EvadingEnemy.leftMove == False and EvadingEnemy.rightMove == False):
 
                                 if (self.rect.x < self.player.rect.x):
                                         self.rect.x -= self.x_speed
             
-                                elif self.rect.x > self.player.rect.x:
+                                elif (self.rect.x > self.player.rect.x):
                                         self.rect.x += self.x_speed
 
-                        elif EvadingEnemy.edge == True and self.offScreen() == 1:
+                        elif (EvadingEnemy.edge == True and self.offScreen() == 1):
                                 EvadingEnemy.leftMove = True
 
-                        elif EvadingEnemy.edge == True and self.offScreen() == 2:
+                        elif (EvadingEnemy.edge == True and self.offScreen() == 2):
                                 EvadingEnemy.rightMove = True
         
-                        if EvadingEnemy.leftMove == True:
+                        if (EvadingEnemy.leftMove == True):
                                 if (self.rect.x < self.player.rect.x):
                                         self.rect.x += 0
 
@@ -306,7 +330,7 @@ class EvadingEnemy(Enemy):
                                         self.leftScreenCollison()
 
                         elif EvadingEnemy.rightMove == True:
-                                if self.rect.x > self.player.rect.x:
+                                if (self.rect.x > self.player.rect.x):
                                         self.rect.x += 0
                                 
                                 else:
@@ -317,12 +341,12 @@ class EvadingEnemy(Enemy):
                         EvadingEnemy.edge = True
                         return 1
 
-                if(self.rect.left + self.rect.width >= 700):
+                if (self.rect.left + self.rect.width >= 700):
                         EvadingEnemy.edge = True
                         return 2
 
         def leftScreenCollison(self):
-                if self.rect.x <= 100:
+                if (self.rect.x <= 100):
                         self.rect.x += self.x_speed
 
                 else:
@@ -330,7 +354,7 @@ class EvadingEnemy(Enemy):
                         EvadingEnemy.edge = False
 
         def rightScreenCollison(self):
-                if self.rect.x >= 510:
+                if (self.rect.x >= 510):
                         self.rect.x -= self.x_speed
 
                 else:
@@ -340,7 +364,7 @@ class EvadingEnemy(Enemy):
 
 class KamikazeEnemy(Enemy):
         def __init__(self, sprite, hp, x_speed, y_speed, player):       
-                Enemy.__init__(self, sprite, hp, x_speed, y_speed)
+                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((128, 128)).convert_alpha())
                 self.sprite = sprite
                 self.hp = 10
                 self.x_speed = x_speed
@@ -353,26 +377,40 @@ class KamikazeEnemy(Enemy):
 
                 #self.checkCollision()
 
-                if self.rect.top < 0:
+                if (self.rect.top < 0):
                         self.rect.y += 6
 
                 else:
                         if (self.rect.x < self.player.rect.x):
                                 self.rect.x += self.x_speed
             
-                        elif self.rect.x > self.player.rect.x:
+                        elif (self.rect.x > self.player.rect.x):
                                 self.rect.x -= self.x_speed
                                 
-                        if self.rect.y < self.player.rect.y:
+                        if (self.rect.y < self.player.rect.y):
                                 self.rect.y += self.y_speed
             
-                        elif self.rect.y > self.player.rect.y:
+                        elif (self.rect.y > self.player.rect.y):
                                 self.rect.y -= self.y_speed
 
 
-WIDTH = 720
-HEIGHT = 1280
+WIDTH = 480
+HEIGHT = 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+fps = 60
+
+BLUE = ((0,0,100))
+LIGHTBLUE = ((0,0,255))
+BLACK = ((0, 0, 0))
+TRANSPARENT = (255, 255, 255, 0)
+WHITE = ((255, 255, 255))
+MAROON = ((115, 0, 0))
+bgCount = 0
+bgCount2 = -1235
+count = 0
+right = False
+left = False
 
 #loading in and scaling bullet image 
 bulletImg = pygame.image.load('sprites/Bullets.png')
@@ -384,13 +422,11 @@ normal = [pygame.image.load("sprites/Normal.png"),  pygame.image.load("sprites/N
 spray = [pygame.image.load("sprites/Spray.png"), pygame.image.load("sprites/Spray2.png")]
 
 
-#loading in the start button images
-startButtonImg = pygame.image.load('sprites/Bullets.png')
-selectedStartButtonImg = pygame.image.load('sprites/Arrow.png')
+#loading in the start images
+startButtonImg = pygame.image.load('sprites/Start_Button .png')
+selectedStartButtonImg = pygame.image.load('sprites/Start_Button2.png')
 
-#shrinking the start button images 
-startButtonImg = pygame.transform.scale(startButtonImg, (300, 100))
-selectedStartButtonImg = pygame.transform.scale(selectedStartButtonImg, (300, 100))
+
 
 #list that will hold all sprite objects
 all_sprites = pygame.sprite.Group()
@@ -400,6 +436,8 @@ bullets = pygame.sprite.Group()
 
 #loading in ship sprite and scaling it down
 char = [pygame.image.load("sprites/Player_Ship.png"), pygame.image.load("sprites/Player_Ship2.png")]
+charLeft = [pygame.image.load("sprites/Player_Ship_Left.png"), pygame.image.load("sprites/Player_Ship_Left2.png")]
+charRight = [pygame.image.load("sprites/Player_Ship_Right.png"), pygame.image.load("sprites/Player_Ship_Right2.png")]
 
 
 #creating player object 
@@ -416,32 +454,22 @@ bg = pygame.image.load("sprites/City_Background.png")
 '''uncomment the line that contains the enemy you want to spawn'''
 #enemies.add(KamikazeEnemy(enemySprites[0], 10, 5, 5, player))
 #enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
+enemies.add(SplashEnemy(enemySprites[count // 6], 30, 0, 6))
 #enemies.add(EvadingEnemy(enemySprites[0], 10, 5, 5, player))
 
-fps = 30
-
-BLUE = ((0,0,100))
-LIGHTBLUE = ((0,0,255))
-BLACK = ((0, 0, 0))
-TRANSPARENT = (255, 255, 255, 0)
-WHITE = ((255, 255, 255))
-MAROON = ((115, 0, 0))
-bgCount = 0
-bgCount2 = -1235
-bgCount3 = -2470
-count = 0
 
 clock = pygame.time.Clock()
 
 pygame.display.set_caption("First Game")
 
 #creating joystick object
-joystick = Circle(610, 750, BLUE, 15)
+stickW = (WIDTH - (WIDTH / 4))
+stickH = (HEIGHT - (HEIGHT / 8))
+joystick = Circle(stickW, stickH, BLUE, 15)
 all_sprites.add(joystick)
 
 #function that will check if mouse is over the joystick
-within = lambda x, low, high: low <= x <= high
+within = (lambda x, low, high: low <= x <= high)
 
 paused = False
 
@@ -453,16 +481,16 @@ def menu():
         
         startButton = StartButton(startButtonImg)
 
-        while menu == True:
+        while (menu == True):
 
                 try:
                         screen.fill(WHITE)
 
                         for event in pygame.event.get():
-                                if event.type == pygame.QUIT:
+                                if (event.type == pygame.QUIT):
                                         menu = False
 
-                        if startButton.clicked():
+                        if (startButton.clicked()):
                                 menu = False
                                 game()
                         
@@ -482,7 +510,6 @@ def game():
         global count
         global bgCount
         global bgCount2
-        global bgCount3
 
         #will count the delay between each shot
         shootTime = 0
@@ -494,84 +521,79 @@ def game():
         running = True
 
         #main game loop
-        while running == True:
+        while (running == True):
 
                 #Will add pause function later 
-                if paused == False:
+                if (paused == False):
 
                         clock.tick(fps)
 
                         shootTime += 1
 
-                        if shootTime == 5:
+                        if (shootTime == 10):
                                 player.shoot()
                                 shootTime = 0
     
                         for event in pygame.event.get():
-                                if event.type == pygame.QUIT:
+                                if (event.type == pygame.QUIT):
                                         running = False
 
-                                if event.type == pygame.KEYDOWN:
-                                        if event.button == K_ESCAPE:
+                                if (event.type == pygame.KEYDOWN):
+                                        if (event.button == K_ESCAPE):
                                                 paused = True
 
-                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                if (event.type == pygame.MOUSEBUTTONDOWN):
 
                                         #if the left mouse button has been clicked
-                                        if event.button == 1:
+                                        if (event.button == 1):
                                                 pos = pygame.mouse.get_pos()
 
                                                 #if the mouse is within the joystick
-                                                if (within(pos[0], *joystick.x_boundary)
-                                        and within(pos[1], *joystick.y_boundary)):
+                                                if ((within(pos[0], *joystick.x_boundary)
+                                        and within(pos[1], *joystick.y_boundary))):
                                                         selected = True
 
                                 #if the mouse button has been released
-                                elif event.type == pygame.MOUSEBUTTONUP:
+                                elif (event.type == pygame.MOUSEBUTTONUP):
 
                                         #move the joystick back to the center of the d-pad
-                                        joystick.rect.centerx, joystick.rect.centery = 610, 750
+                                        joystick.rect.centerx, joystick.rect.centery = stickW, stickH
                                         selected = False
 
                         #if the mouse cursor is over the joystick and the mouse is being pressed
-                        if selected:
+                        if (selected):
                                 joystick.pos = pygame.mouse.get_pos()
                                 joystick.recalc_boundary()
                                 joystick.rect.centerx, joystick.rect.centery = pygame.mouse.get_pos()
 
                                 #range checking to make sure the joystick doesn't move beyond the d-pad
-                                if joystick.pos[0] <= 592:
-                                        pygame.mouse.set_pos((593, joystick.pos[1]))
+                                if (joystick.pos[0] <= (stickW - 20)):
+                                        pygame.mouse.set_pos((stickW - 19), joystick.pos[1])
                 
-                                elif joystick.pos[0] >= 625:
-                                        pygame.mouse.set_pos((624, joystick.pos[1]))
+                                elif (joystick.pos[0] >= (stickW + 20)):
+                                        pygame.mouse.set_pos((stickW + 19), joystick.pos[1])
 
-                                if joystick.pos[1] <= 730:
-                                        pygame.mouse.set_pos((joystick.pos[0], 731))
+                                if (joystick.pos[1] <= (stickH - 20)):
+                                        pygame.mouse.set_pos(joystick.pos[0], (stickH - 19))
 
-                                elif joystick.pos[1] >= 770:
-                                        pygame.mouse.set_pos((joystick.pos[0], 769))
+                                elif (joystick.pos[1] >= (stickH + 20)):
+                                        pygame.mouse.set_pos(joystick.pos[0], (stickH + 19))
 
                         #move the joystick back to the middle of the d-pad
                         else:
-                                joystick.pos = (610, 750)
+                                joystick.pos = (stickW, stickH)
                                 joystick.recalc_boundary()
 
                         # redraw the window
                         screen.blit(bg, (0, bgCount))
                         screen.blit(bg, (0, bgCount2))
-                        screen.blit(bg, (0, bgCount3))
                         bgCount += 5
                         bgCount2 += 5
-                        bgCount3 += 5
-                        if (bgCount >= 1280):
-                                bgCount = bgCount3 - 1235
+                        if (bgCount >= 720):
+                                bgCount = bgCount2 - 1235
 
-                        if (bgCount2 >= 1280):
+                        if (bgCount2 >= 720):
                                 bgCount2 = bgCount -1235
-
-                        if (bgCount3 >= 1280):
-                                bgCount3 = bgCount2 -1235
                         
 
                         #drawing and refreshing the bullets list to check for any action in bullet object
@@ -586,20 +608,33 @@ def game():
                         player.update(screen)
 
                         #all_sprites.draw(screen)
-
                         screen.blit(joystick.image, joystick.rect)
-                        screen.blit(char[count // 3], player.rect)
+                        if (left == False and right == False):
+                                screen.blit(char[count // 6], player.rect)
+
+                        if (left == True):
+                                screen.blit(charLeft[count // 6], player.rect)
+
+                        if (right == True):
+                                screen.blit(charRight[count // 6], player.rect)
+                        
+
+                        if (count + 1 >= 12):
+                                count = 0
+
                         count += 1
 
-                        if (count + 1 >= 6):
-                                count = 0
+                        screen.blit(rightImg, (stickW + 20, stickH - 15))
+                        screen.blit(leftImg, (stickW - 55, stickH - 15))
+                        screen.blit(upImg, (stickW - 15, stickH - 55))
+                        screen.blit(downImg, (stickW - 15, stickH + 20))
 
                         pygame.draw.circle(screen, joystick.color, 
                         joystick.pos, joystick.radius)
 
                         pygame.display.update()
 
-                elif paused == True:
+                elif (paused == True):
                         pause()
 
         pygame.quit()
