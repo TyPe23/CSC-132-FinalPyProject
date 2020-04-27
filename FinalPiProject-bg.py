@@ -68,50 +68,49 @@ class Player(pygame.sprite.Sprite):
                         self.rect.y -= 6
 
                 #creating all the buttons 
-                downButton = Button([(stickW - 20, stickH + 30), (stickW, stickH + 70), (stickW + 20, stickH + 30)], 40, 0, stickW, stickH + 20)
-                rightButton = Button([(stickW + 70, stickH), (stickW + 30, stickH - 20), (stickW + 30, stickH + 20)], 0, 40, stickW + 25, stickH)
-                upButton = Button([(stickW - 20, stickH - 30), (stickW, stickH - 70), (stickW + 20, stickH - 30)], 40, 0, stickW, stickH - 20)
-                leftButton = Button([(stickW - 70, stickH), (stickW - 30, stickH - 20), (stickW - 30, stickH + 20)], 0, 40, stickW - 20, stickH)
+                downButton = Button([(stickX - 20, stickY + 30), (stickX, stickY + 70), (stickX + 20, stickY + 30)], 80, 0, stickX - 10, stickY + 20)
+                rightButton = Button([(stickX + 70, stickY), (stickX + 30, stickY - 20), (stickX + 30, stickY + 20)], 0, 80, stickX + 25, stickY - 10)
+                upButton = Button([(stickX - 20, stickY - 30), (stickX, stickY - 70), (stickX + 20, stickY - 30)], 80, 0, stickX - 10, stickY - 20)
+                leftButton = Button([(stickX - 70, stickY), (stickX - 30, stickY - 20), (stickX - 30, stickY + 20)], 0, 80, stickX - 20, stickY - 10)
 
                 if (not pygame.sprite.collide_rect(joystick, rightButton)):
-                        rightImg = pygame.image.load("sprites/RightArrow.png")
+                        rightImg = pygame.image.load("sprites/RightArrow2.png")
                         
                 else:
                         rightImg = pygame.image.load("sprites/RightArrow.png")
 
                 if (not pygame.sprite.collide_rect(leftButton, joystick)):
-                        leftImg = pygame.image.load("sprites/LeftArrow.png")
+                        leftImg = pygame.image.load("sprites/LeftArrow2.png")
                 else:
                         leftImg = pygame.image.load("sprites/LeftArrow.png")
                         
                 if (not pygame.sprite.collide_rect(upButton, joystick)):
-                        upImg = pygame.image.load("sprites/UpArrow.png")       
+                        upImg = pygame.image.load("sprites/UpArrow2.png")       
                 else:
                         upImg = pygame.image.load("sprites/UpArrow.png")
                         
                 if (not pygame.sprite.collide_rect(downButton, joystick)):
-                        downImg = pygame.image.load("sprites/DownArrow.png")
+                        downImg = pygame.image.load("sprites/DownArrow2.png")
                 else:
                         downImg = pygame.image.load("sprites/DownArrow.png")
 
 
-                if (pygame.sprite.collide_rect(upButton, joystick)):
+                if (pygame.sprite.collide_rect(upButton, joystick) and self.rect.y > 15):
                         self.rect.y -= 6
 
-                elif (pygame.sprite.collide_rect(rightButton, joystick) and left == False):
+                if (pygame.sprite.collide_rect(rightButton, joystick) and left == False and self.rect.x < WIDTH - self.rect.width - 45):
                         self.rect.x += 6
                         right = True
 
-                elif (pygame.sprite.collide_rect(downButton, joystick)):
+                if (pygame.sprite.collide_rect(downButton, joystick) and self.rect.y < HEIGHT - self.rect.height - 45):
                         self.rect.y += 6                       
 
-                elif (pygame.sprite.collide_rect(leftButton, joystick) and right == False):
+                if (pygame.sprite.collide_rect(leftButton, joystick) and right == False and self.rect.x > 5):
                         self.rect.x -= 6
                         left = True
 
-                else:
-                        right = False
-                        left = False
+                right = False
+                left = False
         
 
         #function that creates a bullet object 
@@ -145,13 +144,36 @@ class Bullet(pygame.sprite.Sprite):
                 self.rect.x +=  self.x_speed
                 self.rect.y += self.y_speed
 
+class EnemyBullet(pygame.sprite.Sprite):
+        def __init__(self, x, y, width, height, vx, vy):
+                pygame.sprite.Sprite.__init__(self)
+                self.image = pygame.image.load('sprites/Enemy_Bullets.png')
+                self.rect = self.image.get_rect()
+                self.rect.x = x
+                self.rect.y = y
+                self.x_speed = vx
+                self.y_speed = vy
+
+        def update(self, screen, enemyBulletImg):
+
+                #blit the given sprite to the bullet rect
+                screen.blit(enemyBulletImg, self.rect)
+
+                #if it goes off the screen then kill it
+                if (self.rect.bottom < 0):
+                        self.kill()
+                
+                #make it shoot upwards
+                self.rect.x +=  self.x_speed
+                self.rect.y += self.y_speed
+
 
 #class that creates the circle inside the d-pad
 class Circle(pygame.sprite.Sprite):
         def __init__(self, x, y, color, radius):
                 pygame.sprite.Sprite.__init__(self)
                 self.pos = (x, y)
-                self.image = pygame.Surface((30, 30), pygame.SRCALPHA)
+                self.image = pygame.image.load("sprites/Joystick.png")
                 self.rect = self.image.get_rect(center = self.pos)
                 self.x_boundary = (x - radius, x + radius)
                 self.y_boundary = (y - radius, y + radius)
@@ -212,7 +234,7 @@ class Enemy(pygame.sprite.Sprite):
 
 class NormalEnemy(Enemy):
         def __init__(self, sprite, hp, x_speed, y_speed):
-                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((128, 128)).convert_alpha())
+                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((40, 41)).convert_alpha())
                 self.sprite = sprite
                 self.hp = hp
                 self.x_speed = x_speed if (x_speed > 2 or x_speed < -2) else 3
@@ -226,9 +248,9 @@ class NormalEnemy(Enemy):
                 pygame.draw.rect(screen, (0, 0, 225), self.collisionrect)
 
                 self.enemyBullets.draw(screen)
-                self.enemyBullets.update(screen, bulletImg)
+                self.enemyBullets.update(screen, enemyBulletImg)
 
-                screen.blit(normal[0], self.rect) 
+                screen.blit(normal[count // 6], self.rect) 
                 self.checkCollision()
 
                 if (self.rect.top < 0):
@@ -249,8 +271,8 @@ class NormalEnemy(Enemy):
                                 self.x_speed = random.uniform(3, 6)
                 
         def shoot(self):
-                if (random.randrange(15) == 0):
-                        enemyBullet = Bullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, 0, 9)
+                if (random.randrange(20) == 0):
+                        enemyBullet = EnemyBullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, 0, 6)
                         self.enemyBullets.add(enemyBullet)
 
 
@@ -266,7 +288,7 @@ class SplashEnemy(Enemy):
         def update(self, screen):
 
                 self.enemyBullets.draw(screen)
-                self.enemyBullets.update(screen, bulletImg)
+                self.enemyBullets.update(screen, enemyBulletImg)
 
                 screen.blit(spray[count // 6], self.rect) 
                 self.checkCollision()
@@ -279,8 +301,8 @@ class SplashEnemy(Enemy):
                         self.shoot()
 
         def shoot(self):
-                        enemyBullet1 = Bullet(self.rect.centerx + 23, self.rect.top + self.rect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
-                        enemyBullet2 = Bullet(self.rect.centerx - 35, self.rect.top + self.rect.height, 10, 20, random.randint(-2, -0), random.uniform(3.5, 7.5))
+                        enemyBullet1 = EnemyBullet(self.rect.centerx + 23, self.rect.top + self.rect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
+                        enemyBullet2 = EnemyBullet(self.rect.centerx - 35, self.rect.top + self.rect.height, 10, 20, random.randint(-2, -0), random.uniform(3.5, 7.5))
                         self.enemyBullets.add(enemyBullet1, enemyBullet2)
 
 
@@ -291,7 +313,7 @@ class EvadingEnemy(Enemy):
         rightMove = False
 
         def __init__(self, sprite, hp, x_speed, y_speed, player):       
-                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((128, 128)).convert_alpha())
+                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((72, 80)).convert_alpha())
                 self.sprite = sprite
                 self.hp = 10
                 self.x_speed = x_speed
@@ -300,9 +322,15 @@ class EvadingEnemy(Enemy):
 
         def update(self, screen):
 
-                screen.blit(self.sprite, self.rect)
+                if (self.rect.top >= 300):
+                        screen.blit(healer[count // 6], self.rect)
+
+                else:
+                        screen.blit(healer2[count // 6], self.rect)
 
                 self.offScreen()
+
+                self.checkCollision()
 
                 if (self.rect.top < 300):
                         self.rect.y += 12
@@ -322,19 +350,19 @@ class EvadingEnemy(Enemy):
                         elif (EvadingEnemy.edge == True and self.offScreen() == 2):
                                 EvadingEnemy.rightMove = True
         
-                        if (EvadingEnemy.leftMove == True):
+                        elif (EvadingEnemy.leftMove == True):
                                 if (self.rect.x < self.player.rect.x):
                                         self.rect.x += 0
 
                                 else:
-                                        self.leftScreenCollison()
+                                        self.leftScreenCollision()
 
                         elif EvadingEnemy.rightMove == True:
                                 if (self.rect.x > self.player.rect.x):
                                         self.rect.x += 0
                                 
                                 else:
-                                        self.rightScreenCollison()
+                                        self.rightScreenCollision()
 
         def offScreen(self):
                 if (self.rect.left <= 0):
@@ -345,7 +373,7 @@ class EvadingEnemy(Enemy):
                         EvadingEnemy.edge = True
                         return 2
 
-        def leftScreenCollison(self):
+        def leftScreenCollision(self):
                 if (self.rect.x <= 100):
                         self.rect.x += self.x_speed
 
@@ -353,7 +381,7 @@ class EvadingEnemy(Enemy):
                         EvadingEnemy.leftMove = False
                         EvadingEnemy.edge = False
 
-        def rightScreenCollison(self):
+        def rightScreenCollision(self):
                 if (self.rect.x >= 510):
                         self.rect.x -= self.x_speed
 
@@ -364,7 +392,7 @@ class EvadingEnemy(Enemy):
 
 class KamikazeEnemy(Enemy):
         def __init__(self, sprite, hp, x_speed, y_speed, player):       
-                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((128, 128)).convert_alpha())
+                Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((40, 41)).convert_alpha())
                 self.sprite = sprite
                 self.hp = 10
                 self.x_speed = x_speed
@@ -373,9 +401,9 @@ class KamikazeEnemy(Enemy):
 
         def update(self, screen):
 
-                screen.blit(kamikaze[0], self.rect)
+                screen.blit(kamikaze[count // 6], self.rect)
 
-                #self.checkCollision()
+                self.checkCollision()
 
                 if (self.rect.top < 0):
                         self.rect.y += 6
@@ -403,7 +431,7 @@ fps = 60
 BLUE = ((0,0,100))
 LIGHTBLUE = ((0,0,255))
 BLACK = ((0, 0, 0))
-TRANSPARENT = (255, 255, 255, 0)
+TRANSPARENT = (0, 0, 0, 0)
 WHITE = ((255, 255, 255))
 MAROON = ((115, 0, 0))
 bgCount = 0
@@ -414,13 +442,16 @@ left = False
 
 #loading in and scaling bullet image 
 bulletImg = pygame.image.load('sprites/Bullets.png')
-bulletImg = pygame.transform.scale(bulletImg, (14, 12))
+enemyBulletImg = pygame.image.load('sprites/Enemy_Bullets.png')
+
+
 
 #loading in enemy images  
 kamikaze = [pygame.image.load("sprites/Kamikaze.png"), pygame.image.load("sprites/Kamikaze2.png")]
 normal = [pygame.image.load("sprites/Normal.png"),  pygame.image.load("sprites/Normal2.png")]
 spray = [pygame.image.load("sprites/Spray.png"), pygame.image.load("sprites/Spray2.png")]
-
+healer2 = [pygame.image.load("sprites/Healer.png"), pygame.image.load("sprites/Healer2.png")]
+healer = [pygame.image.load("sprites/Healer3.png"), pygame.image.load("sprites/Healer4.png")]
 
 #loading in the start images
 startButtonImg = pygame.image.load('sprites/Start_Button .png')
@@ -446,16 +477,16 @@ all_sprites.add(player)
 
 #creating sprite group for the enemies
 enemies = pygame.sprite.Group()
-enemySprites = [kamikaze, normal, spray]
+enemySprites = [kamikaze, normal, spray, healer]
 
 # background
 bg = pygame.image.load("sprites/City_Background.png")
 
 '''uncomment the line that contains the enemy you want to spawn'''
-#enemies.add(KamikazeEnemy(enemySprites[0], 10, 5, 5, player))
-#enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-enemies.add(SplashEnemy(enemySprites[count // 6], 30, 0, 6))
-#enemies.add(EvadingEnemy(enemySprites[0], 10, 5, 5, player))
+#enemies.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
+enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
+#enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
+#enemies.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
 
 
 clock = pygame.time.Clock()
@@ -463,9 +494,9 @@ clock = pygame.time.Clock()
 pygame.display.set_caption("First Game")
 
 #creating joystick object
-stickW = (WIDTH - (WIDTH / 4))
-stickH = (HEIGHT - (HEIGHT / 8))
-joystick = Circle(stickW, stickH, BLUE, 15)
+stickX = (WIDTH - (WIDTH / 4))
+stickY = (HEIGHT - (HEIGHT / 8))
+joystick = Circle(stickX, stickY, TRANSPARENT, 15)
 all_sprites.add(joystick)
 
 #function that will check if mouse is over the joystick
@@ -557,7 +588,7 @@ def game():
                                 elif (event.type == pygame.MOUSEBUTTONUP):
 
                                         #move the joystick back to the center of the d-pad
-                                        joystick.rect.centerx, joystick.rect.centery = stickW, stickH
+                                        joystick.rect.centerx, joystick.rect.centery = stickX, stickY
                                         selected = False
 
                         #if the mouse cursor is over the joystick and the mouse is being pressed
@@ -567,21 +598,21 @@ def game():
                                 joystick.rect.centerx, joystick.rect.centery = pygame.mouse.get_pos()
 
                                 #range checking to make sure the joystick doesn't move beyond the d-pad
-                                if (joystick.pos[0] <= (stickW - 20)):
-                                        pygame.mouse.set_pos((stickW - 19), joystick.pos[1])
+                                if (joystick.pos[0] <= (stickX - 20)):
+                                        pygame.mouse.set_pos((stickX - 19), joystick.pos[1])
                 
-                                elif (joystick.pos[0] >= (stickW + 20)):
-                                        pygame.mouse.set_pos((stickW + 19), joystick.pos[1])
+                                elif (joystick.pos[0] >= (stickX + 20)):
+                                        pygame.mouse.set_pos((stickX + 19), joystick.pos[1])
 
-                                if (joystick.pos[1] <= (stickH - 20)):
-                                        pygame.mouse.set_pos(joystick.pos[0], (stickH - 19))
+                                if (joystick.pos[1] <= (stickY - 20)):
+                                        pygame.mouse.set_pos(joystick.pos[0], (stickY - 19))
 
-                                elif (joystick.pos[1] >= (stickH + 20)):
-                                        pygame.mouse.set_pos(joystick.pos[0], (stickH + 19))
+                                elif (joystick.pos[1] >= (stickY + 20)):
+                                        pygame.mouse.set_pos(joystick.pos[0], (stickY + 19))
 
                         #move the joystick back to the middle of the d-pad
                         else:
-                                joystick.pos = (stickW, stickH)
+                                joystick.pos = (stickX, stickY)
                                 joystick.recalc_boundary()
 
                         # redraw the window
@@ -624,13 +655,10 @@ def game():
 
                         count += 1
 
-                        screen.blit(rightImg, (stickW + 20, stickH - 15))
-                        screen.blit(leftImg, (stickW - 55, stickH - 15))
-                        screen.blit(upImg, (stickW - 15, stickH - 55))
-                        screen.blit(downImg, (stickW - 15, stickH + 20))
-
-                        pygame.draw.circle(screen, joystick.color, 
-                        joystick.pos, joystick.radius)
+                        screen.blit(rightImg, (stickX + 20, stickY - 15))
+                        screen.blit(leftImg, (stickX - 55, stickY - 15))
+                        screen.blit(upImg, (stickX - 15, stickY - 55))
+                        screen.blit(downImg, (stickX - 15, stickY + 20))
 
                         pygame.display.update()
 
