@@ -75,28 +75,28 @@ class Player(pygame.sprite.Sprite):
         leftButton = Button([(stickX - 70, stickY), (stickX - 30, stickY - 20), (stickX - 30, stickY + 20)], 0, 80, stickX - 20, stickY - 10)
 
         if (not pygame.sprite.collide_rect(joystick, rightButton)):
-            rightImg = pygame.image.load("sprites/RightArrow2.png")
+            rightImg = pygame.image.load("sprites/Joystick/RightArrow2.png")
                         
         else:
-            rightImg = pygame.image.load("sprites/RightArrow.png")
+            rightImg = pygame.image.load("sprites/Joystick/RightArrow.png")
 
         if (not pygame.sprite.collide_rect(leftButton, joystick)):
-            leftImg = pygame.image.load("sprites/LeftArrow2.png")
+            leftImg = pygame.image.load("sprites/Joystick/LeftArrow2.png")
 
         else:
-            leftImg = pygame.image.load("sprites/LeftArrow.png")
+            leftImg = pygame.image.load("sprites/Joystick/LeftArrow.png")
                         
         if (not pygame.sprite.collide_rect(upButton, joystick)):
-            upImg = pygame.image.load("sprites/UpArrow2.png") 
+            upImg = pygame.image.load("sprites/Joystick/UpArrow2.png") 
 
         else:
-            upImg = pygame.image.load("sprites/UpArrow.png")
+            upImg = pygame.image.load("sprites/Joystick/UpArrow.png")
                         
         if (not pygame.sprite.collide_rect(downButton, joystick)):
-            downImg = pygame.image.load("sprites/DownArrow2.png")
+            downImg = pygame.image.load("sprites/Joystick/DownArrow2.png")
 
         else:
-            downImg = pygame.image.load("sprites/DownArrow.png")
+            downImg = pygame.image.load("sprites/Joystick/DownArrow.png")
 
         if (pygame.sprite.collide_rect(upButton, joystick) and self.rect.y > 15):
             self.rect.y -= 6
@@ -125,7 +125,7 @@ class Player(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, vx, vy):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('sprites/Bullets.png')
+        self.image = pygame.image.load('sprites/Misc/Bullets.png')
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -149,7 +149,7 @@ class Bullet(pygame.sprite.Sprite):
 class EnemyBullet(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, vx, vy):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('sprites/Enemy_Bullets.png')
+        self.image = pygame.image.load('sprites/Misc/Enemy_Bullets.png')
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -187,7 +187,7 @@ class EnemyBullet(pygame.sprite.Sprite):
 class EnemyCircularBullet(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, angle):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('sprites/Enemy_Bullets.png')
+        self.image = pygame.image.load('sprites/Misc/Enemy_Bullets.png')
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -231,7 +231,7 @@ class EnemyRotatingBullet(pygame.sprite.Sprite):
     def __init__(self, sprite, width, height, pos, direction, dt):
         pygame.sprite.Sprite.__init__(self)
         self.sprite = sprite
-        self.image = pygame.image.load('sprites/Enemy_Bullets.png')
+        self.image = pygame.image.load('sprites/Misc/Enemy_Bullets.png')
         self.rect = self.image.get_rect(center = pos)
         self.direction = direction
         self.pos = pygame.Vector2(self.rect.center)
@@ -266,7 +266,7 @@ class Circle(pygame.sprite.Sprite):
     def __init__(self, x, y, color, radius):
         pygame.sprite.Sprite.__init__(self)
         self.pos = (x, y)
-        self.image = pygame.image.load("sprites/Joystick.png")
+        self.image = pygame.image.load("sprites/Joystick/Joystick.png")
         self.rect = self.image.get_rect(center = self.pos)
         self.x_boundary = (x - radius, x + radius)
         self.y_boundary = (y - radius, y + radius)
@@ -793,22 +793,22 @@ left = False
 evadingEnemyAlive = False
 
 #loading in bullet images
-bulletImg = pygame.image.load('sprites/Bullets.png')
-enemyBulletImg = pygame.image.load('sprites/Enemy_Bullets.png')
+bulletImg = pygame.image.load('sprites/Misc/Bullets.png')
+enemyBulletImg = pygame.image.load('sprites/Misc/Enemy_Bullets.png')
 
 #transparent image
-transparent = pygame.image.load('sprites/transparent.png')
+transparent = pygame.image.load('sprites/Misc/transparent.png')
 
 #loading in enemy images  
-kamikaze = [pygame.image.load("sprites/Kamikaze.png"), pygame.image.load("sprites/Kamikaze2.png")]
-normal = [pygame.image.load("sprites/Normal.png"),  pygame.image.load("sprites/Normal2.png")]
-spray = [pygame.image.load("sprites/Spray.png"), pygame.image.load("sprites/Spray2.png")]
-healer2 = [pygame.image.load("sprites/Healer.png"), pygame.image.load("sprites/Healer2.png")]
-healer = [pygame.image.load("sprites/Healer3.png"), pygame.image.load("sprites/Healer4.png")]
+kamikaze = [pygame.image.load("sprites/Enemies/Kamikaze.png"), pygame.image.load("sprites/Enemies/Kamikaze2.png")]
+normal = [pygame.image.load("sprites/Enemies/Normal.png"),  pygame.image.load("sprites/Enemies/Normal2.png")]
+spray = [pygame.image.load("sprites/Enemies/Spray.png"), pygame.image.load("sprites/Enemies/Spray2.png")]
+healer2 = [pygame.image.load("sprites/Enemies/Healer.png"), pygame.image.load("sprites/Enemies/Healer2.png")]
+healer = [pygame.image.load("sprites/Enemies/Healer3.png"), pygame.image.load("sprites/Enemies/Healer4.png")]
 
 #loading in the start images
-startButtonImg = pygame.image.load('sprites/FinalPi2.png')
-selectedStartButtonImg = pygame.image.load('sprites/FinalPi.png')
+startButtonImg = pygame.image.load('sprites/Misc/FinalPi2.png')
+selectedStartButtonImg = pygame.image.load('sprites/Misc/FinalPi.png')
 
 
 #list that will hold all sprite objects
@@ -822,12 +822,12 @@ enemyBullets = pygame.sprite.Group()
 
 #loading in ship sprite and scaling it up
 # sprites
-Ship = pygame.image.load("sprites/Player_Ship.png")
-Ship2 = pygame.image.load("sprites/Player_Ship2.png")
-Left = pygame.image.load("sprites/Player_Ship_Left.png")
-Left2 = pygame.image.load("sprites/Player_Ship_Left2.png")
-Right = pygame.image.load("sprites/Player_Ship_Right.png")
-Right2 = pygame.image.load("sprites/Player_Ship_Right2.png")
+Ship = pygame.image.load("sprites/Player/Player_Ship.png")
+Ship2 = pygame.image.load("sprites/Player/Player_Ship2.png")
+Left = pygame.image.load("sprites/Player/Player_Ship_Left.png")
+Left2 = pygame.image.load("sprites/Player/Player_Ship_Left2.png")
+Right = pygame.image.load("sprites/Player/Player_Ship_Right.png")
+Right2 = pygame.image.load("sprites/Player/Player_Ship_Right2.png")
 # scaling
 Ship = pygame.transform.scale(Ship, (84, 48))
 Ship2 = pygame.transform.scale(Ship2, (84, 48))
@@ -849,10 +849,11 @@ enemies = pygame.sprite.Group()
 enemySprites = [kamikaze, normal, spray, healer]
 
 # background
-bg = pygame.image.load("sprites/City_Background.png")
+bg = pygame.image.load("sprites/Misc/City_Background.png")
 
 '''uncomment the line that contains the enemy you want to spawn'''
 #enemies.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
+enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 #enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
