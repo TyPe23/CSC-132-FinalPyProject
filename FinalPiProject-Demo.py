@@ -397,8 +397,6 @@ class SplashEnemy(Enemy):
         if (Enemy.evadingEnemyAlive == False):
             self.checkCollision()
 
-        print Enemy.evadingEnemyAlive
-
         if (self.rect.bottom < 400):
             self.rect.y += self.y_speed
 
@@ -543,7 +541,7 @@ class Boss(pygame.sprite.Sprite):
 
     def __init__(self, hp):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("sprites/Boss_Base.png")
+        self.image = pygame.image.load("sprites/Enemies/Boss_Base.png")
         #self.image.fill((0, 0, 100))
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
@@ -551,7 +549,7 @@ class Boss(pygame.sprite.Sprite):
         self.hp = hp
 
         #creating left cannon
-        self.leftCannon = pygame.image.load('sprites/Boss_Gun.png')
+        self.leftCannon = pygame.image.load('sprites/Enemies/Boss_Gun.png')
         #self.leftCannon.fill((0, 0, 255))
         self.leftCannonRect = self.leftCannon.get_rect()
         self.leftCannonRect.x = self.rect.width - 389
@@ -560,7 +558,7 @@ class Boss(pygame.sprite.Sprite):
         self.leftCannonCopy = self.leftCannon
 
         #creating right cannon
-        self.rightCannon = pygame.image.load("sprites/Boss_Gun.png")
+        self.rightCannon = pygame.image.load("sprites/Enemies/Boss_Gun.png")
         #self.rightCannon.fill((0, 0, 255))
         self.rightCannonRect = self.rightCannon.get_rect()
         self.rightCannonRect.x = self.rect.width - 88
@@ -620,7 +618,7 @@ class Boss(pygame.sprite.Sprite):
             self.wait += 1
 
             if self.wait == 100:
-                attack = 4
+                attack = 3
 
                 if attack == 1:
                     self.attack = 1
@@ -650,23 +648,14 @@ class Boss(pygame.sprite.Sprite):
     def splashAttack(self):
 
             self.splashWait += 1
-
-            if self.splashWait % 20 == 0:
-                self.leftCannon.fill((255, 255, 255))
-                self.rightCannon.fill((255, 255, 255))
-            else:
-                self.leftCannon.fill((0, 0, 255))
-                self.rightCannon.fill((0, 0, 255))
             
             if self.splashWait >= 149:
-                self.leftCannon.fill((0, 0, 255))
-                self.rightCannon.fill((0, 0, 255))
 
                 if self.splash < 99:
-                    enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
-                    enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))
-                    enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
-                    enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))        
+                    enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx - 4, self.leftCannonRect.top + self.leftCannonRect.height - 10, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
+                    enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx - 4, self.leftCannonRect.top + self.leftCannonRect.height - 10, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))
+                    enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 10, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
+                    enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 10, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))        
                     enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4)
                     self.splash += 1
 
@@ -683,13 +672,13 @@ class Boss(pygame.sprite.Sprite):
         if self.leftSpray < 99:
 
             if self.sprayShootDelay % 10 == 0:
-                enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 0, 5)
-                enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 1, 5)    
-                enemyBullet3 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 2, 5)    
-                enemyBullet4 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 3, 5)    
-                enemyBullet5 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 4, 5)    
-                enemyBullet6 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 5, 5)
-                enemyBullet7 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 6, 5)            
+                enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 0, 5)
+                enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 1, 5)    
+                enemyBullet3 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 2, 5)    
+                enemyBullet4 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 3, 5)    
+                enemyBullet5 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 4, 5)    
+                enemyBullet6 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 5, 5)
+                enemyBullet7 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 6, 5)            
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
             self.leftSpray += 1
 
@@ -699,13 +688,13 @@ class Boss(pygame.sprite.Sprite):
             if self.sprayShootDelay > 200:
 
                 if self.sprayShootDelay % 10 == 0:
-                    enemyBullet1 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, 0, 5)
-                    enemyBullet2 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -1, 5)    
-                    enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -2, 5)    
-                    enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -3, 5)    
-                    enemyBullet5 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -4, 5)    
-                    enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -5, 5)
-                    enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -6, 5)            
+                    enemyBullet1 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, 0, 5)
+                    enemyBullet2 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -1, 5)    
+                    enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -2, 5)    
+                    enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -3, 5)    
+                    enemyBullet5 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -4, 5)    
+                    enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -5, 5)
+                    enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -6, 5)            
                     enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
                 self.rightSpray += 1
 
@@ -727,13 +716,11 @@ class Boss(pygame.sprite.Sprite):
             if self.circularDelay % 10 == 0:
 
                 for x in range (12):
-                    enemyBullet = EnemyCircularBullet(self.rightCannonRect.centerx, self.rightCannonRect.centery + (self.rightCannonRect.height / 2), 10, 20, angle)
+                    enemyBullet = EnemyCircularBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.centery + (self.rightCannonRect.height / 2) - 10, 10, 20, angle)
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
 
             self.rightCircular += 1
-
-            print self.rightCircular
 
         elif self.rightCircular >= 99 and self.leftCircular < 99: 
             angle = 20
@@ -741,7 +728,7 @@ class Boss(pygame.sprite.Sprite):
             if self.circularDelay % 10 == 0:
 
                 for x in range (12):
-                    enemyBullet = EnemyCircularBullet(self.leftCannonRect.centerx, self.leftCannonRect.centery + (self.leftCannonRect.height / 2), 10, 20, angle)
+                    enemyBullet = EnemyCircularBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.centery + (self.leftCannonRect.height / 2) - 8, 10, 20, angle)
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
             
@@ -782,7 +769,6 @@ class Boss(pygame.sprite.Sprite):
 
         rightRotatedImage, rightRect, direction = rotate(self.rightCannonCopy, self.angle, rightPivot, offset)
         rightPos = pygame.Vector2(rightRect.center)
-
 
         #the delay between each shot
         if self.rotatingDelay % 40 == 0:
