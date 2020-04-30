@@ -19,6 +19,19 @@ class Button(pygame.sprite.Sprite):
             self.rect.x = x
             self.rect.y = y
 
+    def update(self):
+        self.clicked()
+
+    def clicked(self):
+        mouse_pos = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if (self.rect.collidepoint(mouse_pos) and click[0] == 1):
+            return True
+
+        else:
+            return False
+
 
 class StartButton(Button):
     def __init__(self, sprite):
@@ -34,19 +47,12 @@ class StartButton(Button):
         if (self.rect.collidepoint(mouse_pos)):
             screen.blit(selectedStartButtonImg, self.rect) 
 
-    def clicked(self):
-        mouse_pos = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-
-        if (self.rect.collidepoint(mouse_pos) and click[0] == 1):
-            return True
-
-        else:
-            return False
-
 
 #class that will create the player (must include a sprite)
 class Player(pygame.sprite.Sprite):
+
+    straightShot = True
+    vShot = False
 
     def __init__(self, sprite, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
@@ -57,12 +63,13 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = y
 
     def update(self, screen):
-    	global right
+        global right
         global left
         global rightImg
         global leftImg
         global upImg
         global downImg
+        global toggleImg
 
         if (self.rect.bottom > HEIGHT - 30):
             self.rect.y -= 6
@@ -72,6 +79,12 @@ class Player(pygame.sprite.Sprite):
         rightButton = Button([(stickX + 70, stickY), (stickX + 30, stickY - 20), (stickX + 30, stickY + 20)], 0, 80, stickX + 25, stickY - 10)
         upButton = Button([(stickX - 20, stickY - 30), (stickX, stickY - 70), (stickX + 20, stickY - 30)], 80, 0, stickX - 10, stickY - 20)
         leftButton = Button([(stickX - 70, stickY), (stickX - 30, stickY - 20), (stickX - 30, stickY + 20)], 0, 80, stickX - 20, stickY - 10)
+
+        if (Player.straightShot == True):
+            toggleImg = pygame.image.load("sprites/DownArrow.png")
+
+        else:
+            toggleImg = pygame.image.load("sprites/UpArrow.png")
 
         if (not pygame.sprite.collide_rect(joystick, rightButton)):
             rightImg = pygame.image.load("sprites/RightArrow2.png")
@@ -116,10 +129,16 @@ class Player(pygame.sprite.Sprite):
 
     #function that creates a bullet object 
     def shoot(self):
-        if (self.rect.bottom <= HEIGHT - 30):
-            bullet1 = Bullet(self.rect.centerx + 45, self.rect.top, 12, 14, 1, -11)
-            bullet2 = Bullet(self.rect.centerx, self.rect.top, 12, 14, -1, -11)
+        if (self.rect.bottom <= HEIGHT - 30) and (Player.straightShot == True):
+            bullet1 = Bullet(self.rect.centerx + 45, self.rect.top, 12, 14, 0, -11)
+            bullet2 = Bullet(self.rect.centerx, self.rect.top, 12, 14, 0, -11)
             bullets.add(bullet1, bullet2)
+        
+        elif (self.rect.bottom <= HEIGHT - 30) and (Player.vShot == True):
+            bullet1 = Bullet(self.rect.centerx + 45, self.rect.top, 12, 14, 2.5, -11)
+            bullet2 = Bullet(self.rect.centerx, self.rect.top, 12, 14, -2.5, -11)
+            bullets.add(bullet1, bullet2)
+
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -169,7 +188,7 @@ class EnemyBullet(pygame.sprite.Sprite):
 
     def offScreen(self):
 
-		#if bullet goes off the screen then kill it
+        #if bullet goes off the screen then kill it
         if (self.rect.bottom < 0):
             self.kill()
 
@@ -199,32 +218,32 @@ class EnemyCircularBullet(pygame.sprite.Sprite):
         self.posx = self.rect.centerx
         self.posy = self.rect.centery
 
-	def update(self, screen, enemyBulletImg):
+    def update(self, screen, enemyBulletImg):
 
-		#blit the given sprite to the bullet rect
-		screen.blit(enemyBulletImg, self.rect)
+        #blit the given sprite to the bullet rect
+        screen.blit(enemyBulletImg, self.rect)
 
-		#check if the bullet is off the screen
-		self.offScreen()
+        #check if the bullet is off the screen
+        self.offScreen()
 
-		self.posx += self.x_speed
-		self.posy += self.y_speed
-		self.rect.center = (self.posx, self.posy)
+        self.posx += self.x_speed
+        self.posy += self.y_speed
+        self.rect.center = (self.posx, self.posy)
 
-	def offScreen(self):
+    def offScreen(self):
 
-		#if bullet goes off the screen then kill it
-		if (self.rect.bottom < 0):
-			self.kill()
+        #if bullet goes off the screen then kill it
+        if (self.rect.bottom < 0):
+            self.kill()
 
-		elif (self.rect.top > HEIGHT):
-			self.kill()
+        elif (self.rect.top > HEIGHT):
+            self.kill()
 
-		elif (self.rect.left + self.rect.width > WIDTH):
-			self.kill()
+        elif (self.rect.left + self.rect.width > WIDTH):
+            self.kill()
 
-		elif (self.rect.right - self.rect.width < 0):
-			self.kill()
+        elif (self.rect.right - self.rect.width < 0):
+            self.kill()
 
 
 class EnemyRotatingBullet(pygame.sprite.Sprite):
@@ -237,28 +256,28 @@ class EnemyRotatingBullet(pygame.sprite.Sprite):
         self.pos = pygame.Vector2(self.rect.center)
         self.dt = dt
 
-	def update(self, screen):
-		screen.blit(self.sprite, self.rect)
+    def update(self, screen, enemyBulletImg):
+        screen.blit(enemyBulletImg, self.rect)
 
-		self.offScreen()
+        self.offScreen()
 
-		self.pos += self.direction * self.dt
-		self.rect.center = self.pos
+        self.pos += self.direction * (self.dt / 3)
+        self.rect.center = self.pos
 
-	def offScreen(self):
+    def offScreen(self):
 
-		#if bullet goes off the screen then kill it
-		if (self.rect.bottom < 0):
-			self.kill()
+        #if bullet goes off the screen then kill it
+        if (self.rect.bottom < 0):
+            self.kill()
 
-		elif (self.rect.top > HEIGHT):
-			self.kill()
+        elif (self.rect.top > HEIGHT):
+            self.kill()
 
-		elif (self.rect.left + self.rect.width > WIDTH):
-			self.kill()
+        elif (self.rect.left + self.rect.width > WIDTH):
+            self.kill()
 
-		elif (self.rect.right - self.rect.width < 0):
-			self.kill()
+        elif (self.rect.right - self.rect.width < 0):
+            self.kill()
 
 
 #class that creates the circle inside the d-pad
@@ -275,13 +294,16 @@ class Circle(pygame.sprite.Sprite):
 
     #function that will redraw the circle as it is being moved
     def recalc_boundary(self):
-    	self.x_boundary = (self.pos[0] - self.radius, self.pos[0] + self.radius)
+        self.x_boundary = (self.pos[0] - self.radius, self.pos[0] + self.radius)
         self.y_boundary = (self.pos[1] - self.radius, self.pos[1] + self.radius)
 
 
 class Enemy(pygame.sprite.Sprite):
+
+    evadingEnemyAlive = False
+
     def __init__(self, sprite, hp, x_speed, y_speed, image):
-    	pygame.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self)
         self.sprite = sprite
         self.image = image
         self.image.fill((255, 255, 255, 0))
@@ -304,7 +326,7 @@ class Enemy(pygame.sprite.Sprite):
                     self.hp -= 1
                 else:
                     self.kill()
-            	bullet.kill()
+                bullet.kill()
 
     def alive(self):
         if (self.hp > 0):
@@ -333,7 +355,7 @@ class NormalEnemy(Enemy):
 
         screen.blit(normal[count // 6], self.rect)
 
-        if not evadingEnemyAlive:
+        if Enemy.evadingEnemyAlive == False:
             self.checkCollision()
 
         if (self.rect.top < 0):
@@ -361,7 +383,7 @@ class NormalEnemy(Enemy):
 
 class SplashEnemy(Enemy):
     def __init__(self, sprite, hp, x_speed, y_speed):
-    	Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((72, 60)).convert_alpha())
+        Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((72, 60)).convert_alpha())
         self.sprite = sprite
         self.hp = hp
         self.x_speed = x_speed
@@ -369,13 +391,12 @@ class SplashEnemy(Enemy):
 
     def update(self, screen):
 
-        self.enemyBullets.draw(screen)
-        self.enemyBullets.update(screen, enemyBulletImg)
-
         screen.blit(spray[count // 6], self.rect)
 
-        if not evadingEnemyAlive:
-        	self.checkCollision()
+        if (Enemy.evadingEnemyAlive == False):
+            self.checkCollision()
+
+        print Enemy.evadingEnemyAlive
 
         if (self.rect.bottom < 400):
             self.rect.y += self.y_speed
@@ -405,84 +426,85 @@ class EvadingEnemy(Enemy):
         self.player = player
 
     def update(self, screen):
-		global evadingEnemyAlive
-		evadingEnemyAlive = True
 
-		global xDist
-		xDist = (self.rect.centerx - self.player.rect.centerx)
+        Enemy.evadingEnemyAlive = True
 
-		self.checkCollision()
+        if self.alive() == False:
+            Enemy.evadingEnemyAlive = False
 
-		self.offScreen()
+        global xDist
+        xDist = (self.rect.centerx - self.player.rect.centerx)
 
-		if (self.rect.top >= 300):
-			screen.blit(healer[count // 6], self.rect)
+        self.checkCollision()
 
-		else:
-			screen.blit(healer2[count // 6], self.rect)
+        self.offScreen()
 
-		if not self.alive():
-			evadingEnemyAlive = False
+        if (self.rect.top >= 300):
+            screen.blit(healer[count // 6], self.rect)
 
-		if xDist < 0:
-			xDist *= -1
+        else:
+            screen.blit(healer2[count // 6], self.rect)
 
-		if self.rect.top < 300:
-			self.rect.y += 12
+        if xDist < 0:
+            xDist *= -1
 
-		else:
-			if (EvadingEnemy.edge == False) and (EvadingEnemy.leftMove == False) and (EvadingEnemy.rightMove == False):
+        if self.rect.top < 300:
+            self.rect.y += 12
 
-				if (self.rect.x < self.player.rect.x) and (xDist < 185):
-					self.rect.x -= self.x_speed
+        else:
+            if (EvadingEnemy.edge == False) and (EvadingEnemy.leftMove == False) and (EvadingEnemy.rightMove == False):
+
+                if (self.rect.x < self.player.rect.x) and (xDist < 185):
+                    self.rect.x -= self.x_speed
             
-				elif (self.rect.x > self.player.rect.x) and (xDist < 150):
-					self.rect.x += self.x_speed
+                elif (self.rect.x > self.player.rect.x) and (xDist < 150):
+                    self.rect.x += self.x_speed
 
-			elif EvadingEnemy.edge == True and self.offScreen() == 1:
-				EvadingEnemy.leftMove = True
+            elif EvadingEnemy.edge == True and self.offScreen() == 1:
+                EvadingEnemy.leftMove = True
 
-			elif EvadingEnemy.edge == True and self.offScreen() == 2:
-				EvadingEnemy.rightMove = True
-	
-			if EvadingEnemy.leftMove == True:
-				if ((self.rect.left + self.rect.width) < self.player.rect.left):
-					self.rect.x += 0
+            elif EvadingEnemy.edge == True and self.offScreen() == 2:
+                EvadingEnemy.rightMove = True
+    
+            if EvadingEnemy.leftMove == True:
+                if ((self.rect.left + self.rect.width) < self.player.rect.left):
+                    self.rect.x += 0
 
-				else:
-					self.leftScreenCollison()
+                else:
+                    self.leftScreenCollison()
 
-			elif EvadingEnemy.rightMove == True:
-				if ((self.player.rect.left + self.player.rect.width) < self.rect.left):
-					self.rect.x += 0
-				
-				else:
-					self.rightScreenCollison()
+            elif EvadingEnemy.rightMove == True:
+                if ((self.player.rect.left + self.player.rect.width) < self.rect.left):
+                    self.rect.x += 0
+                
+                else:
+                    self.rightScreenCollison()
 
     def offScreen(self):
-		if (self.rect.left <= 0):
-			EvadingEnemy.edge = True
-			return 1
+        if (self.rect.left <= 0):
+            EvadingEnemy.edge = True
+            return 1
 
-		if(self.rect.left + self.rect.width >= WIDTH):
-			EvadingEnemy.edge = True
-			return 2
+        if(self.rect.left + self.rect.width >= WIDTH):
+            EvadingEnemy.edge = True
+            return 2
 
     def leftScreenCollison(self):
         if (self.rect.x <= self.rect.width):
-			self.rect.x += self.x_speed
+            self.rect.x += self.x_speed
 
         else:
             EvadingEnemy.leftMove = False
             EvadingEnemy.edge = False
 
     def rightScreenCollison(self):
-		if self.rect.x >= (WIDTH - (self.rect.width * 2)):
-			self.rect.x -= self.x_speed
+        if self.rect.x >= (WIDTH - (self.rect.width * 2)):
+            self.rect.x -= self.x_speed
 
-		else:
-			EvadingEnemy.rightMove = False
-			EvadingEnemy.edge = False
+        else:
+            EvadingEnemy.rightMove = False
+            EvadingEnemy.edge = False
+
 
 class KamikazeEnemy(Enemy):
     def __init__(self, sprite, hp, x_speed, y_speed, player):       
@@ -495,7 +517,7 @@ class KamikazeEnemy(Enemy):
 
     def update(self, screen):
 
-    	screen.blit(kamikaze[count // 6], self.rect)
+        screen.blit(kamikaze[count // 6], self.rect)
 
         self.checkCollision()
 
@@ -529,7 +551,7 @@ class Boss(pygame.sprite.Sprite):
         self.sprite = sprite
         self.hp = hp
 
-		#creating left cannon
+        #creating left cannon
         self.leftCannon = pygame.Surface((30, 100), pygame.SRCALPHA, 32)
         self.leftCannon.fill((0, 0, 255))
         self.leftCannonRect = self.leftCannon.get_rect()
@@ -538,53 +560,54 @@ class Boss(pygame.sprite.Sprite):
         self.leftCannonAngleSpeed = 1
         self.leftCannonCopy = self.leftCannon
 
-		#creating right cannon
+        #creating right cannon
         self.rightCannon = pygame.Surface((30, 100))
         self.rightCannon.fill((0, 0, 255))
         self.rightCannonRect = self.rightCannon.get_rect()
         self.rightCannonRect.centerx = (self.rect.left + self.rect.width) - 25
         self.rightCannonRect.y = self.rect.top + 150
 
-		#time to wait between each attack
+        #time to wait between each attack
         self.wait = 0
 
-		#time before splash attack starts
+        #time before splash attack starts
         self.splashWait = 0
 
-		#duration of splash attack
+        #duration of splash attack
         self.splash = 0
 
-		#timer that will handle delay between each spray shoot (bullets would
-		#shoot continuously otherwise)
+        #timer that will handle delay between each spray shoot (bullets would
+        #shoot continuously otherwise)
         self.sprayShootDelay = 0
 
-		#duration of left spray attack
+        #duration of left spray attack
         self.leftSpray = 0
 
-		#duration of right spray attack
+        #duration of right spray attack
         self.rightSpray = 0
 
-		#duration of circular attack
-        self.circular = 0
+        #duration of circular attack
+        self.leftCircular = 0
+        self.rightCircular = 0
 
-		#timer that will handle delay between each circular shot (bullets would
-		#shoot continuously otherwise)
+        #timer that will handle delay between each circular shot (bullets would
+        #shoot continuously otherwise)
         self.circularDelay = 0
 
-		#will determine which attack is executed
+        #will determine which attack is executed
         self.attack = 0
 
-		#angle that the cannon will be rotating by during rotating attack
+        #angle that the cannon will be rotating by during rotating attack
         self.angle = 0
 
         self.rotatingDelay = 0
 
-		#variable to keep track of how many times surface has rotated 90 degrees
+        #variable to keep track of how many times surface has rotated 90 degrees
         self.rotateCount = 0
 
     def update(self, screen):
 
-		#replace self.image with self.sprite
+        #replace self.image with self.sprite
         screen.blit(self.image, self.rect)
         screen.blit(self.sprite, self.rect)
         screen.blit(self.leftCannon, self.leftCannonRect)
@@ -599,10 +622,10 @@ class Boss(pygame.sprite.Sprite):
             self.wait += 1
 
             if self.wait == 100:
-                attack = 4
+                attack = 2
 
                 if attack == 1:
-					self.attack = 1
+                    self.attack = 1
 
                 elif attack == 2:
                     self.attack = 2
@@ -618,136 +641,154 @@ class Boss(pygame.sprite.Sprite):
 
             elif self.attack == 2:
                 self.sprayAttack()
-			
+            
             elif self.attack == 3:
                 self.circularAttack()
 
             elif self.attack == 4:
                 self.rotatingAttack(screen)
-			
+            
 
-	def splashAttack(self):
+    def splashAttack(self):
 
-			self.splashWait += 1
+            self.splashWait += 1
 
-			if self.splashWait % 5 == 0:
-				self.leftCannon.fill((255, 255, 255))
-			else:
-				self.leftCannon.fill((0, 0, 255))
-			
-			if self.splashWait >= 100:
-				self.leftCannon.fill((0, 0, 255))
+            if self.splashWait % 20 == 0:
+                self.leftCannon.fill((255, 255, 255))
+                self.rightCannon.fill((255, 255, 255))
+            else:
+                self.leftCannon.fill((0, 0, 255))
+                self.rightCannon.fill((0, 0, 255))
+            
+            if self.splashWait >= 149:
+                self.leftCannon.fill((0, 0, 255))
+                self.rightCannon.fill((0, 0, 255))
 
-				if self.splash < 99:
-					enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, random.randint(0, 1), random.uniform(3.5, 7.5))
-					enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))
-					enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, random.randint(0, 1), random.uniform(3.5, 7.5))
-					enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))		
-					enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4)
-					self.splash += 1
+                if self.splash < 99:
+                    enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
+                    enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))
+                    enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
+                    enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))        
+                    enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4)
+                    self.splash += 1
 
-				else:
-					self.splash = 0
-					self.splashWait = 0
-					self.wait = -150
-					self.attack = 0
+                else:
+                    self.splash = 0
+                    self.splashWait = 0
+                    self.wait = -150
+                    self.attack = 0
 
-	def sprayAttack(self):
+    def sprayAttack(self):
 
-		self.sprayShootDelay += 1
+        self.sprayShootDelay += 1
 
-		if self.leftSpray < 99:
+        if self.leftSpray < 99:
 
-			if self.sprayShootDelay % 10 == 0:
-				enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 0, 5, bulletImg)
-				enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 1, 5, bulletImg)	
-				enemyBullet3 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 2, 5, bulletImg)	
-				enemyBullet4 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 3, 5, bulletImg)	
-				enemyBullet5 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 4, 5, bulletImg)	
-				enemyBullet6 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 5, 5, bulletImg)
-				enemyBullet7 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 6, 5, bulletImg)			
-				enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
-			self.leftSpray += 1
+            if self.sprayShootDelay % 10 == 0:
+                enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 0, 5)
+                enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 1, 5)    
+                enemyBullet3 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 2, 5)    
+                enemyBullet4 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 3, 5)    
+                enemyBullet5 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 4, 5)    
+                enemyBullet6 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 5, 5)
+                enemyBullet7 = EnemyBullet(self.leftCannonRect.centerx, self.leftCannonRect.top + self.leftCannonRect.height, 10, 20, 6, 5)            
+                enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
+            self.leftSpray += 1
 
-		elif self.leftSpray >= 99 and self.rightSpray < 99:
+        elif self.leftSpray >= 99 and self.rightSpray < 99:
 
-			#delay time between left cannon shooting and right cannon shooting
-			if self.sprayShootDelay > 200:
+            #delay time between left cannon shooting and right cannon shooting
+            if self.sprayShootDelay > 200:
 
-				if self.sprayShootDelay % 10 == 0:
-					enemyBullet1 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, 0, 5, bulletImg)
-					enemyBullet2 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -1, 5, bulletImg)	
-					enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -2, 5, bulletImg)	
-					enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -3, 5, bulletImg)	
-					enemyBullet5 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -4, 5, bulletImg)	
-					enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -5, 5, bulletImg)
-					enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -6, 5, bulletImg)			
-					enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
-				self.rightSpray += 1
+                if self.sprayShootDelay % 10 == 0:
+                    enemyBullet1 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, 0, 5)
+                    enemyBullet2 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -1, 5)    
+                    enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -2, 5)    
+                    enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -3, 5)    
+                    enemyBullet5 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -4, 5)    
+                    enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -5, 5)
+                    enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx, self.rightCannonRect.top + self.rightCannonRect.height, 10, 20, -6, 5)            
+                    enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
+                self.rightSpray += 1
 
-		else:
-			self.leftSpray = 0
-			self.rightSpray = 0
-			self.sprayShootDelay = 0
-			self.wait = -100
-			self.attack = 0
+        else:
+            self.leftSpray = 0
+            self.rightSpray = 0
+            self.sprayShootDelay = 0
+            self.wait = -100
+            self.attack = 0
 
-	def circularAttack(self):
+    def circularAttack(self):
 
-		angle = 20
+        angle = 20
 
-		self.circularDelay += 1
+        self.circularDelay += 1
 
-		if self.circular < 99:
+        if self.rightCircular < 99:
 
-			if self.circularDelay % 10 == 0:
+            if self.circularDelay % 10 == 0:
 
-				for x in range (12):
-					enemyBullet = EnemyCircularBullet(self.rightCannonRect.centerx, self.rightCannonRect.centery + (self.rightCannonRect.height / 2), 10, 20, bulletImg, angle)
-					enemyBullets.add(enemyBullet)
-					angle -= 20 if angle <= 140 else 140
+                for x in range (12):
+                    enemyBullet = EnemyCircularBullet(self.rightCannonRect.centerx, self.rightCannonRect.centery + (self.rightCannonRect.height / 2), 10, 20, angle)
+                    enemyBullets.add(enemyBullet)
+                    angle -= 20 if angle <= 140 else 140
 
-			self.circular += 1
+            self.rightCircular += 1
 
-		else:
-			self.circularDelay = 0
-			self.circular = 0
-			self.wait = -200
-			angle = 0
+            print self.rightCircular
+
+        elif self.rightCircular >= 99 and self.leftCircular < 99: 
+            angle = 20
+
+            if self.circularDelay % 10 == 0:
+
+                for x in range (12):
+                    enemyBullet = EnemyCircularBullet(self.leftCannonRect.centerx, self.leftCannonRect.centery + (self.leftCannonRect.height / 2), 10, 20, angle)
+                    enemyBullets.add(enemyBullet)
+                    angle -= 20 if angle <= 140 else 140
+            
+            self.leftCircular += 1
+
+        else:
+            self.circularDelay = 0
+            self.rightCircular = 0
+            self.leftCircular = 0 
+            self.wait = -200
+            angle = 0
 
     def rotatingAttack(self, screen):
 
-        self.rotatingDelay += 1
+        self.rotatingDelay += 5
 
-		#the direction of the cannon
+        #the direction of the cannon
         global direction
         direction = pygame.Vector2(0, 1)
 
-		#making the original image invisible
+        #making the original image invisible
         self.leftCannon = transparent
 
-		#pivot point for cannon rotation
+        #pivot point for cannon rotation
         pivot = self.leftCannonRect.x + (self.leftCannonRect.width / 2), self.leftCannonRect.y
 
-		#the offset that the rectangle will rotate by
+        #the offset that the rectangle will rotate by
         offset = pygame.math.Vector2(0, 50)
 
-		#increasing the angle for rotation
+        #increasing the angle for rotation
         self.angle += self.leftCannonAngleSpeed
 
-		#rotating the image 
+        #rotating the image 
         rotated_image, rect, direction = rotate(self.leftCannonCopy, self.angle, pivot, offset)
         pos = pygame.Vector2(rect.center)
 
-		#blitting the rotated image to its rectangle
+        #blitting the rotated image to its rectangle
         screen.blit(rotated_image, rect)
 
-		#the delay between each shot
-        if self.rotatingDelay % 20 == 0:
+        #the delay between each shot
+        if self.rotatingDelay % 40 == 0:
             enemyBullet = EnemyRotatingBullet(bulletImg, 10, 20, pos, direction.normalize(), dt)
             enemyBullets.add(enemyBullet)
 
-		#preventing the cannon from rotating over 90 degrees
+        #preventing the cannon from rotating over 90 degrees
         if self.angle >= 90:
             self.leftCannonAngleSpeed *= -1
             self.rotateCount += 1
@@ -767,12 +808,12 @@ class Boss(pygame.sprite.Sprite):
 #function that rotates a surface given a surface, angle, pivot, and offset
 #returns the rotated surface, its rectangle, and the rectangles direction
 def rotate(surface, angle, pivot, offset):
-	direction = pygame.Vector2(0, 1).rotate(angle)	
-	rotated_image = pygame.transform.rotozoom(surface, -angle, 1)
-	rotated_image = rotated_image.convert_alpha()
-	rotated_offset = offset.rotate(angle)
-	rect = rotated_image.get_rect(center = pivot + rotated_offset)
-	return rotated_image, rect, direction
+    direction = pygame.Vector2(0, 1).rotate(angle)    
+    rotated_image = pygame.transform.rotozoom(surface, -angle, 1)
+    rotated_image = rotated_image.convert_alpha()
+    rotated_offset = offset.rotate(angle)
+    rect = rotated_image.get_rect(center = pivot + rotated_offset)
+    return rotated_image, rect, direction
 
 
 WIDTH = 480
@@ -840,8 +881,8 @@ bg = pygame.image.load("sprites/City_Background.png")
 #enemies.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
 #enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 #enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
-enemies.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
-#enemies.add(Boss(normal[0], (40)))
+#enemies.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
+enemies.add(Boss(normal[0], (40)))
 
 clock = pygame.time.Clock()
 
@@ -853,12 +894,18 @@ stickY = (HEIGHT - (HEIGHT / 8))
 joystick = Circle(stickX, stickY, TRANSPARENT, 15)
 all_sprites.add(joystick)
 
+toggleX = (WIDTH - (5 * WIDTH / 6))
+toggleY = (HEIGHT - (HEIGHT / 8))
+
+toggleButton = Button(None, 56, 44, toggleX, toggleY)
+
 #function that will check if mouse is over the joystick
 within = (lambda x, low, high: low <= x <= high)
 
 paused = False
 
 movetime = 0
+
 
 def menu():
 
@@ -895,6 +942,7 @@ def game():
     global count
     global bgCount
     global bgCount2
+    global dt
 
     #will count the delay between each shot
     shootTime = 0
@@ -911,7 +959,7 @@ def game():
         #Will add pause function later 
         if (paused == False):
 
-        	    dt = clock.tick(fps)
+                dt = clock.tick(fps)
 
                 shootTime += 1
 
@@ -935,14 +983,22 @@ def game():
 
                             #if the mouse is within the joystick
                             if ((within(pos[0], *joystick.x_boundary)
-                            	and within(pos[1], *joystick.y_boundary))):
-                            	selected = True
+                                and within(pos[1], *joystick.y_boundary))):
+                                selected = True
+                            
+                            if toggleButton.clicked() and Player.straightShot == True:
+                                Player.straightShot = False
+                                Player.vShot = True
+
+                            elif toggleButton.clicked() and Player.vShot == True:
+                                Player.vShot = False 
+                                Player.straightShot = True
 
                             #if the mouse button has been released
                     elif (event.type == pygame.MOUSEBUTTONUP):
 
-                    	#move the joystick back to the center of the d-pad
-                    	joystick.rect.centerx, joystick.rect.centery = stickX, stickY
+                        #move the joystick back to the center of the d-pad
+                        joystick.rect.centerx, joystick.rect.centery = stickX, stickY
                         selected = False
 
                         #if the mouse cursor is over the joystick and the mouse is being pressed
@@ -969,7 +1025,7 @@ def game():
                     joystick.pos = (stickX, stickY)
                     joystick.recalc_boundary()
 
-            	# redraw the window
+                # redraw the window
                 screen.blit(bg, (0, bgCount))
                 screen.blit(bg, (0, bgCount2))
                 bgCount += 5
@@ -979,12 +1035,15 @@ def game():
 
                 if (bgCount2 >= 720):
                     bgCount2 = bgCount -1235
+
+
+                toggleButton.update()
                         
                 #drawing and refreshing the bullets list to check for any action in bullet object
                 bullets.update(screen, bulletImg)
                 bullets.draw(screen)
 
-				#drawing and refreshing enemy bullets list to check for any action in enemy bullet object
+                #drawing and refreshing enemy bullets list to check for any action in enemy bullet object
                 enemyBullets.update(screen, enemyBulletImg)
                 enemyBullets.draw(screen)
 
@@ -1015,6 +1074,7 @@ def game():
                 screen.blit(leftImg, (stickX - 55, stickY - 15))
                 screen.blit(upImg, (stickX - 15, stickY - 55))
                 screen.blit(downImg, (stickX - 15, stickY + 20))
+                screen.blit(toggleImg, (toggleX, toggleY))
 
                 pygame.display.update()
 
