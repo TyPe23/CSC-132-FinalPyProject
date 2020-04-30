@@ -135,8 +135,8 @@ class Player(pygame.sprite.Sprite):
             bullets.add(bullet1, bullet2)
         
         elif (self.rect.bottom <= HEIGHT - 30) and (Player.vShot == True):
-            bullet1 = Bullet(self.rect.centerx + 45, self.rect.top, 12, 14, 2.5, -11)
-            bullet2 = Bullet(self.rect.centerx, self.rect.top, 12, 14, -2.5, -11)
+            bullet1 = Bullet(self.rect.centerx + 45, self.rect.top, 12, 14, 3, -11)
+            bullet2 = Bullet(self.rect.centerx, self.rect.top, 12, 14, -3, -11)
             bullets.add(bullet1, bullet2)
 
 
@@ -257,8 +257,9 @@ class EnemyRotatingBullet(pygame.sprite.Sprite):
         self.dt = dt
 
     def update(self, screen, enemyBulletImg):
-        screen.blit(enemyBulletImg, self.rect)
 
+        screen.blit(enemyBulletImg, self.rect)
+        
         self.offScreen()
 
         self.pos += self.direction * (self.dt / 3)
@@ -540,32 +541,32 @@ class KamikazeEnemy(Enemy):
 
 class Boss(pygame.sprite.Sprite):
 
-    def __init__(self, sprite, hp):
+    def __init__(self, hp):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((WIDTH - 40, 200))
-        self.image.fill((0, 0, 100))
-        self.sprite = sprite
+        self.image = pygame.image.load("sprites/Boss_Base.png")
+        #self.image.fill((0, 0, 100))
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = -150
-        self.sprite = sprite
         self.hp = hp
 
         #creating left cannon
-        self.leftCannon = pygame.Surface((30, 100), pygame.SRCALPHA, 32)
-        self.leftCannon.fill((0, 0, 255))
+        self.leftCannon = pygame.image.load('sprites/Boss_Gun.png')
+        #self.leftCannon.fill((0, 0, 255))
         self.leftCannonRect = self.leftCannon.get_rect()
-        self.leftCannonRect.centerx = self.rect.left + 25
-        self.leftCannonRect.y = self.rect.top + 150
+        self.leftCannonRect.x = self.rect.width - 389
+        self.leftCannonRect.y = self.rect.height
         self.leftCannonAngleSpeed = 1
         self.leftCannonCopy = self.leftCannon
 
         #creating right cannon
-        self.rightCannon = pygame.Surface((30, 100))
-        self.rightCannon.fill((0, 0, 255))
+        self.rightCannon = pygame.image.load("sprites/Boss_Gun.png")
+        #self.rightCannon.fill((0, 0, 255))
         self.rightCannonRect = self.rightCannon.get_rect()
-        self.rightCannonRect.centerx = (self.rect.left + self.rect.width) - 25
-        self.rightCannonRect.y = self.rect.top + 150
+        self.rightCannonRect.x = self.rect.width - 88
+        self.rightCannonRect.y = self.rect.height 
+        self.rightCannonAngleSpeed = -1
+        self.rightCannonCopy = self.rightCannon
 
         #time to wait between each attack
         self.wait = 0
@@ -607,22 +608,19 @@ class Boss(pygame.sprite.Sprite):
 
     def update(self, screen):
 
-        #replace self.image with self.sprite
-        screen.blit(self.image, self.rect)
-        screen.blit(self.sprite, self.rect)
         screen.blit(self.leftCannon, self.leftCannonRect)
         screen.blit(self.rightCannon, self.rightCannonRect)
-
+        
         if self.rect.top <= 0:
             self.rect.y += 6
-            self.leftCannonRect.y = self.rect.y + 150
-            self.rightCannonRect.y = self.rect.y + 150
+            self.leftCannonRect.y = self.rect.y + 45
+            self.rightCannonRect.y = self.rect.y + 45
 
         else:  
             self.wait += 1
 
             if self.wait == 100:
-                attack = 2
+                attack = 4
 
                 if attack == 1:
                     self.attack = 1
@@ -764,11 +762,13 @@ class Boss(pygame.sprite.Sprite):
         global direction
         direction = pygame.Vector2(0, 1)
 
-        #making the original image invisible
+        #making the original images invisible
         self.leftCannon = transparent
+        self.rightCannon = transparent
 
         #pivot point for cannon rotation
-        pivot = self.leftCannonRect.x + (self.leftCannonRect.width / 2), self.leftCannonRect.y
+        leftPivot = self.leftCannonRect.x + (self.leftCannonRect.width / 2), self.leftCannonRect.y + 10
+        rightPivot = self.rightCannonRect.x + (self.rightCannonRect.width / 2), self.rightCannonRect.y + 10
 
         #the offset that the rectangle will rotate by
         offset = pygame.math.Vector2(0, 50)
@@ -776,29 +776,38 @@ class Boss(pygame.sprite.Sprite):
         #increasing the angle for rotation
         self.angle += self.leftCannonAngleSpeed
 
-        #rotating the image 
-        rotated_image, rect, direction = rotate(self.leftCannonCopy, self.angle, pivot, offset)
-        pos = pygame.Vector2(rect.center)
+        #rotating the images
+        leftRotatedImage, leftRect, direction = rotate(self.leftCannonCopy, self.angle, leftPivot, offset)
+        leftPos = pygame.Vector2(leftRect.center)
 
-        #blitting the rotated image to its rectangle
-        screen.blit(rotated_image, rect)
+        rightRotatedImage, rightRect, direction = rotate(self.rightCannonCopy, self.angle, rightPivot, offset)
+        rightPos = pygame.Vector2(rightRect.center)
+
 
         #the delay between each shot
         if self.rotatingDelay % 40 == 0:
-            enemyBullet = EnemyRotatingBullet(bulletImg, 10, 20, pos, direction.normalize(), dt)
-            enemyBullets.add(enemyBullet)
+            enemyBullet1 = EnemyRotatingBullet(bulletImg, 10, 20, leftPos, direction.normalize(), dt)
+            enemyBullet2 = EnemyRotatingBullet(bulletImg, 10, 20, rightPos, direction.normalize(), dt) 
+            enemyBullets.add(enemyBullet1, enemyBullet2)
+
+         #blitting the rotated images to its rectangle
+        screen.blit(leftRotatedImage, leftRect)
+        screen.blit(rightRotatedImage, rightRect)
 
         #preventing the cannon from rotating over 90 degrees
         if self.angle >= 90:
             self.leftCannonAngleSpeed *= -1
+            self.rightCannonAngleSpeed *= -1
             self.rotateCount += 1
 
         elif self.angle <= -90:
             self.leftCannonAngleSpeed *= -1
+            self.rightCannonAngleSpeed *= -1
             self.rotateCount += 1
 
         if (self.rotateCount == 2) and (self.angle >= 0):
             self.leftCannon = self.leftCannonCopy
+            self.rightCannon = self.rightCannonCopy
             self.rotateCount = 0
             self.rotatingDelay = 0
             self.attack = 0
@@ -838,9 +847,6 @@ left = False
 bulletImg = pygame.image.load('sprites/Bullets.png')
 enemyBulletImg = pygame.image.load('sprites/Enemy_Bullets.png')
 
-#transparent image
-transparent = pygame.image.load('sprites/transparent.png')
-
 #loading in enemy images  
 kamikaze = [pygame.image.load("sprites/Kamikaze.png"), pygame.image.load("sprites/Kamikaze2.png")]
 normal = [pygame.image.load("sprites/Normal.png"),  pygame.image.load("sprites/Normal2.png")]
@@ -860,6 +866,10 @@ bullets = pygame.sprite.Group()
 
 #list that will hold all enemy bullet objects 
 enemyBullets = pygame.sprite.Group()
+
+#a transparent image
+transparent = pygame.image.load("sprites/transparent.png")
+transparent = pygame.transform.scale(transparent, (45, 118))
 
 #loading in ship sprite and scaling it down
 char = [pygame.image.load("sprites/Player_Ship.png"), pygame.image.load("sprites/Player_Ship2.png")]
@@ -882,7 +892,7 @@ bg = pygame.image.load("sprites/City_Background.png")
 #enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 #enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
 #enemies.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
-enemies.add(Boss(normal[0], (40)))
+enemies.add(Boss(40))
 
 clock = pygame.time.Clock()
 
@@ -1043,13 +1053,13 @@ def game():
                 bullets.update(screen, bulletImg)
                 bullets.draw(screen)
 
-                #drawing and refreshing enemy bullets list to check for any action in enemy bullet object
-                enemyBullets.update(screen, enemyBulletImg)
-                enemyBullets.draw(screen)
-
                 #drawing and refreshing the enemies list to check for any action in enemy object
                 enemies.draw(screen)
                 enemies.update(screen)
+
+                #drawing and refreshing enemy bullets list to check for any action in enemy bullet object
+                enemyBullets.draw(screen)
+                enemyBullets.update(screen, enemyBulletImg)
 
                 #refreshing the player to check for any action
                 player.update(screen)
