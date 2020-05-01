@@ -35,18 +35,41 @@ class Button(pygame.sprite.Sprite):
 
 class StartButton(Button):
     def __init__(self, sprite):
-        Button.__init__(self, points = None, width = WIDTH / 2, height = HEIGHT / 8, x = WIDTH / 4, y = HEIGHT / 3)
+        Button.__init__(self, points = None, width = 248, height = 192, x = WIDTH / 4, y = HEIGHT / 3)
         self.sprite = sprite
-        self.image.fill(BLUE)
 
     def update(self, screen):
-        screen.blit(self.sprite, self.rect)
 
         mouse_pos = pygame.mouse.get_pos()
 
         if (self.rect.collidepoint(mouse_pos)):
-            screen.blit(selectedStartButtonImg, self.rect) 
+            screen.blit(selectedStartButtonImg, self.rect)
 
+        else:
+            screen.blit(self.sprite, self.rect)
+
+class ToggleButton(Button):
+    def __init__(self, sprite):
+        Button.__init__(self, points = None, width = 56, height = 44, x = toggleX, y = toggleY)
+        self.sprite = sprite
+
+    def update(self, screen):
+
+        mouse_pos = pygame.mouse.get_pos()
+
+        if (Player.straightShot == True):
+            if (self.rect.collidepoint(mouse_pos)):
+                screen.blit(toggleStraight[1], self.rect)
+
+            else:
+                screen.blit(toggleStraight[0], self.rect)
+
+        if (Player.vShot == True):
+            if (self.rect.collidepoint(mouse_pos)):
+                screen.blit(toggleWide[1], self.rect)
+
+            else:
+                screen.blit(toggleWide[0], self.rect)
 
 #class that will create the player (must include a sprite)
 class Player(pygame.sprite.Sprite):
@@ -541,7 +564,7 @@ class Boss(pygame.sprite.Sprite):
 
     def __init__(self, hp):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("sprites/Enemies/Boss_Base.png")
+        self.image = pygame.image.load("sprites/Boss_Base.png")
         #self.image.fill((0, 0, 100))
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
@@ -549,7 +572,7 @@ class Boss(pygame.sprite.Sprite):
         self.hp = hp
 
         #creating left cannon
-        self.leftCannon = pygame.image.load('sprites/Enemies/Boss_Gun.png')
+        self.leftCannon = pygame.image.load('sprites/Boss_Gun.png')
         #self.leftCannon.fill((0, 0, 255))
         self.leftCannonRect = self.leftCannon.get_rect()
         self.leftCannonRect.x = self.rect.width - 389
@@ -558,13 +581,14 @@ class Boss(pygame.sprite.Sprite):
         self.leftCannonCopy = self.leftCannon
 
         #creating right cannon
-        self.rightCannon = pygame.image.load("sprites/Enemies/Boss_Gun.png")
+        self.rightCannon = pygame.image.load("sprites/Boss_Gun.png")
         #self.rightCannon.fill((0, 0, 255))
         self.rightCannonRect = self.rightCannon.get_rect()
         self.rightCannonRect.x = self.rect.width - 88
         self.rightCannonRect.y = self.rect.height 
         self.rightCannonAngleSpeed = -1
         self.rightCannonCopy = self.rightCannon
+
 
         #time to wait between each attack
         self.wait = 0
@@ -604,6 +628,8 @@ class Boss(pygame.sprite.Sprite):
         #variable to keep track of how many times surface has rotated 90 degrees
         self.rotateCount = 0
 
+        self.untouchableCannonDelay = 0
+
     def update(self, screen):
 
         screen.blit(self.leftCannon, self.leftCannonRect)
@@ -617,8 +643,10 @@ class Boss(pygame.sprite.Sprite):
         else:  
             self.wait += 1
 
+            #self.untouchableCannonDelay += 1
+
             if self.wait == 100:
-                attack = 3
+                attack = 4
 
                 if attack == 1:
                     self.attack = 1
@@ -643,7 +671,17 @@ class Boss(pygame.sprite.Sprite):
 
             elif self.attack == 4:
                 self.rotatingAttack(screen)
-            
+        
+            #having the untouchable cannons shoot after a certain amount of time
+            if self.untouchableCannonDelay % 50 == 343343:
+                enemyBullet1 = EnemyCircularBullet(153, 60, 10, 20, -90)
+                enemyBullet2 = EnemyCircularBullet(153, 60, 10, 20, -110)
+                enemyBullet3 = EnemyCircularBullet(153, 60, 10, 20, -70)
+                enemyBullet4 = EnemyCircularBullet(318, 60, 10, 20, -90)
+                enemyBullet5 = EnemyCircularBullet(318, 60, 10, 20, -110)
+                enemyBullet6 = EnemyCircularBullet(318, 60, 10, 20, -70)
+                enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6)
+                self.untouchableCannonDelay = 0 
 
     def splashAttack(self):
 
@@ -765,10 +803,18 @@ class Boss(pygame.sprite.Sprite):
 
         #rotating the images
         leftRotatedImage, leftRect, direction = rotate(self.leftCannonCopy, self.angle, leftPivot, offset)
-        leftPos = pygame.Vector2(leftRect.center)
 
         rightRotatedImage, rightRect, direction = rotate(self.rightCannonCopy, self.angle, rightPivot, offset)
-        rightPos = pygame.Vector2(rightRect.center)
+
+        leftPivotCopy = leftRect.centerx + 1, leftRect.centery - 20
+        leftRotatedImageCopy, leftRectCopy, direction = rotate(self.leftCannonCopy, self.angle, leftPivotCopy, offset)
+        leftRectCopy.bottom += 20
+        leftPos = pygame.Vector2(leftRectCopy.center)
+
+        rightPivotCopy = rightRect.centerx + 1, rightRect.centery - 20
+        rightRotatedImageCopy, rightRectCopy, direction = rotate(self.rightCannonCopy, self.angle, rightPivotCopy, offset)
+        rightRectCopy.bottom += 20
+        rightPos = pygame.Vector2(rightRectCopy.center)
 
         #the delay between each shot
         if self.rotatingDelay % 40 == 0:
@@ -828,10 +874,14 @@ bgCount2 = -1235
 count = 0
 right = False
 left = False
+evadingEnemyAlive = False
 
 #loading in bullet images
 bulletImg = pygame.image.load('sprites/Bullets.png')
 enemyBulletImg = pygame.image.load('sprites/Enemy_Bullets.png')
+
+#transparent image
+transparent = pygame.image.load('sprites/transparent.png')
 
 #loading in enemy images  
 kamikaze = [pygame.image.load("sprites/Kamikaze.png"), pygame.image.load("sprites/Kamikaze2.png")]
@@ -841,8 +891,10 @@ healer2 = [pygame.image.load("sprites/Healer.png"), pygame.image.load("sprites/H
 healer = [pygame.image.load("sprites/Healer3.png"), pygame.image.load("sprites/Healer4.png")]
 
 #loading in the start images
-startButtonImg = pygame.image.load('sprites/Start_Button .png')
-selectedStartButtonImg = pygame.image.load('sprites/Start_Button2.png')
+startButtonImg = pygame.image.load('sprites/FinalPi2.png')
+selectedStartButtonImg = pygame.image.load('sprites/FinalPi.png')
+toggleStraight = [pygame.image.load('sprites/Toggle.png'), pygame.image.load('sprites/Toggle2.png')]
+toggleWide = [pygame.image.load('sprites/Toggle3.png'), pygame.image.load('sprites/Toggle4.png')]
 
 #list that will hold all sprite objects
 all_sprites = pygame.sprite.Group()
@@ -853,14 +905,25 @@ bullets = pygame.sprite.Group()
 #list that will hold all enemy bullet objects 
 enemyBullets = pygame.sprite.Group()
 
-#a transparent image
-transparent = pygame.image.load("sprites/transparent.png")
-transparent = pygame.transform.scale(transparent, (45, 118))
-
-#loading in ship sprite and scaling it down
-char = [pygame.image.load("sprites/Player_Ship.png"), pygame.image.load("sprites/Player_Ship2.png")]
-charLeft = [pygame.image.load("sprites/Player_Ship_Left.png"), pygame.image.load("sprites/Player_Ship_Left2.png")]
-charRight = [pygame.image.load("sprites/Player_Ship_Right.png"), pygame.image.load("sprites/Player_Ship_Right2.png")]
+#loading in ship sprite and scaling it up
+# sprites
+Ship = pygame.image.load("sprites/Player_Ship.png")
+Ship2 = pygame.image.load("sprites/Player_Ship2.png")
+Left = pygame.image.load("sprites/Player_Ship_Left.png")
+Left2 = pygame.image.load("sprites/Player_Ship_Left2.png")
+Right = pygame.image.load("sprites/Player_Ship_Right.png")
+Right2 = pygame.image.load("sprites/Player_Ship_Right2.png")
+# scaling
+Ship = pygame.transform.scale(Ship, (84, 48))
+Ship2 = pygame.transform.scale(Ship2, (84, 48))
+Left = pygame.transform.scale(Left, (84, 48))
+Left2 = pygame.transform.scale(Left2, (84, 48))
+Right = pygame.transform.scale(Right, (84, 48))
+Right2 = pygame.transform.scale(Right2, (84, 48))
+# sprite lists for animation
+char = [Ship, Ship2]
+charLeft = [Left, Left2]
+charRight = [Right, Right2]
 
 #creating player object 
 player = Player(char, WIDTH / 2, HEIGHT + 100, 56, 32)
@@ -905,6 +968,9 @@ movetime = 0
 
 def menu():
 
+    global bgCount
+    global bgCount2
+
     menu = True
         
     startButton = StartButton(startButtonImg)
@@ -912,7 +978,16 @@ def menu():
     while (menu == True):
 
         try:
-            screen.fill(WHITE)
+            screen.blit(bg, (0, bgCount))
+            screen.blit(bg, (0, bgCount2))
+            bgCount += 3
+            bgCount2 += 3
+            if (bgCount >= 720):
+                bgCount = bgCount2 - 1235
+
+            if (bgCount2 >= 720):
+                bgCount2 = bgCount -1235
+
 
             for event in pygame.event.get():
                 if (event.type == pygame.QUIT):
@@ -934,6 +1009,8 @@ def menu():
 
 def game():
 
+    global left
+    global right
     global paused
     global count
     global bgCount
@@ -956,6 +1033,8 @@ def game():
         if (paused == False):
 
                 dt = clock.tick(fps)
+
+                toggleButton = ToggleButton(toggleStraight[0])
 
                 shootTime += 1
 
@@ -1033,7 +1112,7 @@ def game():
                     bgCount2 = bgCount -1235
 
 
-                toggleButton.update()
+                toggleButton.update(screen)
                         
                 #drawing and refreshing the bullets list to check for any action in bullet object
                 bullets.update(screen, bulletImg)
@@ -1070,7 +1149,6 @@ def game():
                 screen.blit(leftImg, (stickX - 55, stickY - 15))
                 screen.blit(upImg, (stickX - 15, stickY - 55))
                 screen.blit(downImg, (stickX - 15, stickY + 20))
-                screen.blit(toggleImg, (toggleX, toggleY))
 
                 pygame.display.update()
 
