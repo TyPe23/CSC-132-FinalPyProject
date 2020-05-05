@@ -71,7 +71,7 @@ class ToggleButton(Button):
             else:
                 screen.blit(toggleWide[0], self.rect)
 
-#class that will create the player (must include a sprite)
+#class that will create the player 
 class Player(pygame.sprite.Sprite):
 
     straightShot = True
@@ -404,6 +404,7 @@ class Circle(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
 
     evadingEnemyAlive = False
+    move = False
 
     def __init__(self, sprite, hp, x_speed, y_speed, image):
         pygame.sprite.Sprite.__init__(self)
@@ -455,6 +456,7 @@ class NormalEnemy(Enemy):
         self.y_speed = y_speed if (x_speed > 2 or x_speed < -2) else 3
         self.xdirection = 1
         self.ydirection = 1
+        self.delay = random.randint(-400, -100)
 
     def update(self, screen):
 
@@ -462,15 +464,19 @@ class NormalEnemy(Enemy):
 
         if Enemy.evadingEnemyAlive == False:
             self.checkCollision()
+
+        if self.delay <= 0:
+            self.delay += 1
             
-        if (self.rect.top < 0):
+        elif (self.rect.top < 0) and (self.delay >= 0):
+            self.hit = False
             self.rect.y += 6
-
-        if (self.hit == True):
-            screen.blit(normalHit[count // 6], self.rect)
             
-
         else:
+
+            if (self.hit == True):
+                screen.blit(normalHit[count // 6], self.rect)
+
             self.shoot()
 
             self.rect.x += self.x_speed * self.xdirection
@@ -687,6 +693,7 @@ class Boss(pygame.sprite.Sprite):
         self.leftCannonRect.y = self.rect.height
         self.leftCannonAngleSpeed = 1
         self.leftCannonCopy = self.leftCannon
+        self.leftCannonHP = 15
 
         #creating right cannon
         self.rightCannon = pygame.image.load("sprites/Enemies/Boss_Gun.png")
@@ -696,7 +703,7 @@ class Boss(pygame.sprite.Sprite):
         self.rightCannonRect.y = self.rect.height 
         self.rightCannonAngleSpeed = -1
         self.rightCannonCopy = self.rightCannon
-
+        self.rightCannonHP = 15
 
         #time to wait between each attack
         self.wait = 0
@@ -728,6 +735,9 @@ class Boss(pygame.sprite.Sprite):
         #will determine which attack is executed
         self.attack = 0
 
+        #keeps track of the attack previously executed 
+        self.oldAttack = 0 
+
         #angle that the cannon will be rotating by during rotating attack
         self.angle = 0
 
@@ -749,14 +759,25 @@ class Boss(pygame.sprite.Sprite):
             self.rightCannonRect.y = self.rect.y + 45
 
         else:  
+
+            self.cannonCollision(screen)
+
             self.wait += 1
 
             self.untouchableCannonDelay += 0.5
 
             if self.wait == 100:
-                attack = 3
+                attack = 4  #random.randint(1, 4)
+                
+                if attack == self.oldAttack:
+                    
+                    if attack == 4:
+                        self.attack = 1
 
-                if attack == 1:
+                    else:
+                        self.attack = self.oldAttack + 1
+
+                elif attack == 1:
                     self.attack = 1
 
                 elif attack == 2:
@@ -767,6 +788,8 @@ class Boss(pygame.sprite.Sprite):
 
                 elif attack == 4:
                     self.attack = 4
+                
+                self.oldAttack = self.attack
 
             if self.attack == 1:
                 self.splashAttack()
@@ -791,6 +814,30 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6)
                 self.untouchableCannonDelay = 0
 
+    def cannonCollision(self, screen):
+        for bullet in bullets:
+
+            if self.rightCannonRect.colliderect(bullet):
+
+                if self.rightCannonHP > 0:
+                    self.rightCannonHP -= 1
+                    bullet.kill()
+
+            if self.leftCannonRect.colliderect(bullet):
+
+                if self.leftCannonHP > 0:
+                    self.leftCannonHP -= 1
+                    bullet.kill()
+
+        if self.leftCannonHP <= 0:
+            screen.blit(Ship, self.leftCannonRect)
+
+        if self.rightCannonHP <= 0:
+            screen.blit(Ship, self.rightCannonRect)
+
+        if (self.leftCannonHP == 0 and self.rightCannonHP == 0):
+            self.wait = 0 
+
     def splashAttack(self):
 
             self.splashWait += 1
@@ -802,7 +849,17 @@ class Boss(pygame.sprite.Sprite):
                     enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx - 4, self.leftCannonRect.top + self.leftCannonRect.height - 10, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))
                     enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 10, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
                     enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 10, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))        
-                    enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4)
+                    
+
+                    if self.leftCannonHP > 0 and self.rightCannonHP <= 0:
+                        enemyBullets.add(enemyBullet1, enemyBullet2)
+
+                    elif self.rightCannonHP > 0 and self.leftCannonHP <= 0:
+                        enemyBullets.add(enemyBullet3, enemyBullet4)
+
+                    else:
+                        enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4)
+                        
                     self.splash += 1
 
                 else:
@@ -810,12 +867,12 @@ class Boss(pygame.sprite.Sprite):
                     self.splashWait = 0
                     self.wait = -150
                     self.attack = 0
-
+    
     def sprayAttack(self):
 
         self.sprayShootDelay += 1
 
-        if self.leftSpray < 99:
+        if (self.leftSpray < 99 and self.leftCannonHP > 0):
 
             if self.sprayShootDelay % 10 == 0:
                 enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 0, 5)
@@ -828,7 +885,7 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
             self.leftSpray += 1
 
-        elif self.leftSpray >= 99 and self.rightSpray < 99:
+        elif (self.leftSpray >= 99 and self.rightSpray < 99 and self.rightCannonHP > 0) or (self.rightSpray < 99 and self.rightCannonHP > 0):
 
             #delay time between left cannon shooting and right cannon shooting
             if self.sprayShootDelay > 200:
@@ -857,7 +914,7 @@ class Boss(pygame.sprite.Sprite):
 
         self.circularDelay += 1
 
-        if self.rightCircular < 99:
+        if self.rightCircular < 99 and self.rightCannonHP > 0:
 
             if self.circularDelay % 10 == 0:
 
@@ -868,7 +925,7 @@ class Boss(pygame.sprite.Sprite):
 
             self.rightCircular += 1
 
-        elif self.rightCircular >= 99 and self.leftCircular < 99: 
+        elif (self.rightCircular >= 99 and self.leftCircular < 99 and self.leftCannonHP > 0) or (self.leftCircular < 99 and self.leftCannonHP > 0): 
             angle = 20
 
             if self.circularDelay % 10 == 0:
@@ -884,8 +941,8 @@ class Boss(pygame.sprite.Sprite):
             self.circularDelay = 0
             self.rightCircular = 0
             self.leftCircular = 0 
+            self.attack = 0
             self.wait = -200
-            angle = 0
 
     def rotatingAttack(self, screen):
 
@@ -895,13 +952,8 @@ class Boss(pygame.sprite.Sprite):
         global direction
         direction = pygame.Vector2(0, 1)
 
-        #making the original images invisible
-        self.leftCannon = transparent
-        self.rightCannon = transparent
-
         #pivot point for cannon rotation
         leftPivot = self.leftCannonRect.x + (self.leftCannonRect.width / 2), self.leftCannonRect.y + 10
-        rightPivot = self.rightCannonRect.x + (self.rightCannonRect.width / 2), self.rightCannonRect.y + 10
 
         #the offset that the rectangle will rotate by
         offset = pygame.math.Vector2(0, 50)
@@ -909,30 +961,56 @@ class Boss(pygame.sprite.Sprite):
         #increasing the angle for rotation
         self.angle += self.leftCannonAngleSpeed
 
-        #rotating the images
-        leftRotatedImage, leftRect, direction = rotate(self.leftCannonCopy, self.angle, leftPivot, offset)
+        #if the right cannon still has health
+        if self.rightCannonHP > 0:
 
-        rightRotatedImage, rightRect, direction = rotate(self.rightCannonCopy, self.angle, rightPivot, offset)
+            #making the original image invisible
+            self.rightCannon = transparent
 
-        leftPivotCopy = leftRect.centerx + 1, leftRect.centery - 20
-        leftRotatedImageCopy, leftRectCopy, direction = rotate(self.leftCannonCopy, self.angle, leftPivotCopy, offset)
-        leftRectCopy.bottom += 20
-        leftPos = pygame.Vector2(leftRectCopy.center)
+            #pivot point for cannon rotation
+            rightPivot = self.rightCannonRect.x + (self.rightCannonRect.width / 2), self.rightCannonRect.y + 10
 
-        rightPivotCopy = rightRect.centerx + 1, rightRect.centery - 20
-        rightRotatedImageCopy, rightRectCopy, direction = rotate(self.rightCannonCopy, self.angle, rightPivotCopy, offset)
-        rightRectCopy.bottom += 20
-        rightPos = pygame.Vector2(rightRectCopy.center)
+            #rotating the image
+            rightRotatedImage, rightRect, direction = rotate(self.rightCannonCopy, self.angle, rightPivot, offset)
 
-        #the delay between each shot
-        if self.rotatingDelay % 40 == 0:
-            enemyBullet1 = EnemyRotatingBullet(bulletImg, 10, 20, leftPos, direction.normalize(), 20)
-            enemyBullet2 = EnemyRotatingBullet(bulletImg, 10, 20, rightPos, direction.normalize(), 20) 
-            enemyBullets.add(enemyBullet1, enemyBullet2)
+            #making a copy of the rotated image so the shooting will be aligned with the image of the cannon
+            rightPivotCopy = rightRect.centerx + 1, rightRect.centery - 20
+            rightRotatedImageCopy, rightRectCopy, direction = rotate(self.rightCannonCopy, self.angle, rightPivotCopy, offset)
+            rightRectCopy.bottom += 20
+            rightPos = pygame.Vector2(rightRectCopy.center)
 
-         #blitting the rotated images to its rectangle
-        screen.blit(leftRotatedImage, leftRect)
-        screen.blit(rightRotatedImage, rightRect)
+            screen.blit(rightRotatedImage, rightRect)
+
+            #the delay between each shot
+            if self.rotatingDelay % 40 == 0:
+                enemyBullet = EnemyRotatingBullet(bulletImg, 10, 20, rightPos, direction.normalize(), 20) 
+                enemyBullets.add(enemyBullet)
+
+        #if the left cannon still has health 
+        if self.leftCannonHP > 0:
+
+            #making the original image invisible
+            self.leftCannon = transparent
+
+            #pivot point for cannon rotation
+            leftPivot = self.leftCannonRect.x + (self.leftCannonRect.width / 2), self.leftCannonRect.y + 10
+
+            #rotating the image
+            leftRotatedImage, leftRect, direction = rotate(self.leftCannonCopy, self.angle, leftPivot, offset)
+
+            #making a copy of the rotated image so the shooting will be aligned with the image of the cannon
+            leftPivotCopy = leftRect.centerx + 1, leftRect.centery - 20
+            leftRotatedImageCopy, leftRectCopy, direction = rotate(self.leftCannonCopy, self.angle, leftPivotCopy, offset)
+            leftRectCopy.bottom += 20
+            leftPos = pygame.Vector2(leftRectCopy.center)
+
+            #blitting the rotated images to its rectangle
+            screen.blit(leftRotatedImage, leftRect)
+
+            #the delay between each shot
+            if self.rotatingDelay % 40 == 0:
+                enemyBullet = EnemyRotatingBullet(bulletImg, 10, 20, leftPos, direction.normalize(), 20) 
+                enemyBullets.add(enemyBullet)
 
         #preventing the cannon from rotating over 90 degrees
         if self.angle >= 90:
@@ -946,8 +1024,13 @@ class Boss(pygame.sprite.Sprite):
             self.rotateCount += 1
 
         if (self.rotateCount == 2) and (self.angle >= 0):
-            self.leftCannon = self.leftCannonCopy
-            self.rightCannon = self.rightCannonCopy
+
+            if self.leftCannonHP > 0:
+                self.leftCannon = self.leftCannonCopy
+
+            if self.rightCannonHP:
+                self.rightCannon = self.rightCannonCopy
+
             self.rotateCount = 0
             self.rotatingDelay = 0
             self.attack = 0
@@ -1039,7 +1122,7 @@ charLeft = [Left, Left2]
 charRight = [Right, Right2]
 
 #list that will contain the player object
-playerObj= pygame.sprite.Group()
+playerObj = pygame.sprite.Group()
 
 #creating player object 
 player = Player(char, WIDTH / 2 - 42, HEIGHT + 100, 84, 48, 10)
@@ -1049,14 +1132,27 @@ playerObj.add(player)
 enemies = pygame.sprite.Group()
 enemySprites = [kamikaze, normal, spray, healer]
 
+#creating level system
+levelOne = pygame.sprite.Group()
+levelOne.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelOne.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelOne.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+
+levelTwo = pygame.sprite.Group()
+levelTwo.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
+levelTwo.add(SplashEnemy(enemySprites[2], 30, 0, 6))
+
+levelThree = pygame.sprite.Group()
+levelThree.add(Boss(40))
+
 # background
 bg = pygame.image.load("sprites/Misc/City_Background.png")
 
 '''uncomment the line that contains the enemy you want to spawn'''
 #enemies.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
-enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
+#enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
+#enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
+#enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 #enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
 #enemies.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
 #enemies.add(Boss(40))
@@ -1144,6 +1240,8 @@ def game():
     #boolean that will control the state of the game (running or not running)
     running = True
 
+    level = 1
+
     #main game loop
     while (running == True):
 
@@ -1152,9 +1250,12 @@ def game():
 
                 dt = clock.tick(fps)
 
+                print player.hp
+
                 toggleButton = ToggleButton(toggleStraight[0])
 
-                #shootTime += 1
+                #if player.alive():
+                    #shootTime += 1
 
                 if (shootTime == 10):
                     player.shoot()
@@ -1187,14 +1288,14 @@ def game():
                                 Player.vShot = False 
                                 Player.straightShot = True
 
-                            #if the mouse button has been released
+                    #if the mouse button has been released
                     elif (event.type == pygame.MOUSEBUTTONUP):
 
                         #move the joystick back to the center of the d-pad
                         joystick.rect.centerx, joystick.rect.centery = stickX, stickY
                         selected = False
 
-                        #if the mouse cursor is over the joystick and the mouse is being pressed
+                #if the mouse cursor is over the joystick and the mouse is being pressed
                 if (selected):
                     joystick.pos = pygame.mouse.get_pos()
                     joystick.recalc_boundary()
@@ -1236,9 +1337,17 @@ def game():
                 bullets.update(screen, bulletImg)
                 bullets.draw(screen)
 
-                #drawing and refreshing the enemies list to check for any action in enemy object
-                enemies.draw(screen)
-                enemies.update(screen)
+                if level == 1:
+                    levelOne.draw(screen)
+                    levelOne.update(screen)
+
+                elif level == 2:
+                    levelTwo.draw(screen)
+                    levelTwo.update(screen)
+
+                elif level == 3:
+                    levelThree.draw(screen)
+                    levelThree.update(screen)
 
                 #drawing and refreshing enemy bullets list to check for any action in enemy bullet object
                 enemyBullets.draw(screen)
@@ -1250,13 +1359,18 @@ def game():
                 screen.blit(joystick.image, joystick.rect)
                 
                 if player.alive():
-                    if (left == False and right == False):
+
+                    if player.hit == True:
+                        if player.hitDelay % 5 == 0:
+                            screen.blit(Ship, player.rect)
+
+                    elif (left == False and right == False):
                         screen.blit(char[count // 6], player.rect)
 
-                    if (left == True):
+                    elif (left == True):
                          screen.blit(charLeft[count // 6], player.rect)
 
-                    if (right == True):
+                    elif (right == True):
                         screen.blit(charRight[count // 6], player.rect)
                         
                     if (count + 1 >= 12):
@@ -1266,6 +1380,12 @@ def game():
 
                     left = False
                     right = False
+
+                if len(levelOne) <= 0:
+                    level = 2
+
+                if len(levelTwo) <= 0:
+                    level = 3
 
                 screen.blit(rightImg, (stickX + 20, stickY - 15))
                 screen.blit(leftImg, (stickX - 55, stickY - 15))
