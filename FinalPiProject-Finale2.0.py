@@ -415,6 +415,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.centerx = random.randint(0 + self.rect.width, WIDTH - self.rect.width)
         self.rect.bottom = -150
         self.hit = False
+        self.hitDelay = 50
 
         self.x_speed = x_speed
         self.y_speed = y_speed
@@ -430,9 +431,19 @@ class Enemy(pygame.sprite.Sprite):
                 if (self.hp > 0):
                     self.hp -= 1
                     self.hit = True
-                else:
-                    self.kill()
                 bullet.kill()
+        if (self.hp <= 0):
+            self.hitDelay -= 1
+            print self.hitDelay
+            if (self.hitDelay >= 0):
+                screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.rect)
+            else:
+                self.kill()
+
+    def explode(self):
+        if self.hitDelay >= 0:
+            screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.rect)
+            self.hitDelay -= 1
 
     def alive(self):
         if (self.hp > 0):
@@ -477,6 +488,10 @@ class NormalEnemy(Enemy):
             if (self.hit == True):
                 screen.blit(normalHit[count // 6], self.rect)
 
+            if (self.alive() == False):
+                self.x_speed = 0
+                self.y_speed = 0
+
             self.shoot()
 
             self.rect.x += self.x_speed * self.xdirection
@@ -495,7 +510,7 @@ class NormalEnemy(Enemy):
        
                 
     def shoot(self):
-        if (random.randrange(20) == 0):
+        if (random.randrange(20) == 0 and self.alive() == True):
             enemyBullet = EnemyBullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, 0, 6)
             enemyBullets.add(enemyBullet)
 
@@ -646,6 +661,7 @@ class KamikazeEnemy(Enemy):
         self.y_speed = y_speed
         self.player = player
 
+    # updates the health, collision and position
     def update(self, screen):
 
         screen.blit(kamikaze[count // 6], self.rect)
@@ -765,18 +781,19 @@ class Boss(pygame.sprite.Sprite):
 
             self.cannonCollision(screen)
 
-            if (leftCannonHit == True):
-                screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.leftCannonRect)
+            if (self.attack != 4):
+                if (leftCannonHit == True):
+                    screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.leftCannonRect)
 
-            if (rightCannonHit == True):
-                screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.rightCannonRect)
+                if (rightCannonHit == True):
+                    screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.rightCannonRect)
 
             self.wait += 1
 
             self.untouchableCannonDelay += 0.5
 
             if self.wait == 100:
-                attack = random.randint(1, 4)
+                attack = 4 #random.randint(1, 4)
                 
                 if attack == self.oldAttack:
                     
@@ -990,6 +1007,7 @@ class Boss(pygame.sprite.Sprite):
 
             #rotating the image
             rightRotatedImage, rightRect, direction = rotate(self.rightCannonCopy, self.angle, rightPivot, offset)
+            rightHit, rightRect2, direction2 = rotate(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.angle, rightPivot, offset)
 
             #making a copy of the rotated image so the shooting will be aligned with the image of the cannon
             rightPivotCopy = rightRect.centerx + 1, rightRect.centery - 20
@@ -997,7 +1015,10 @@ class Boss(pygame.sprite.Sprite):
             rightRectCopy.bottom += 20
             rightPos = pygame.Vector2(rightRectCopy.center)
 
-            screen.blit(rightRotatedImage, rightRect)
+            if (rightCannonHit == True):
+                screen.blit(rightHit, rightRect2)
+            else:
+                screen.blit(rightRotatedImage, rightRect)
 
             #the delay between each shot
             if self.rotatingDelay % 40 == 0:
@@ -1015,6 +1036,7 @@ class Boss(pygame.sprite.Sprite):
 
             #rotating the image
             leftRotatedImage, leftRect, direction = rotate(self.leftCannonCopy, self.angle, leftPivot, offset)
+            leftHit, leftRect2, direction2 = rotate(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.angle, leftPivot, offset)
 
             #making a copy of the rotated image so the shooting will be aligned with the image of the cannon
             leftPivotCopy = leftRect.centerx + 1, leftRect.centery - 20
@@ -1023,7 +1045,10 @@ class Boss(pygame.sprite.Sprite):
             leftPos = pygame.Vector2(leftRectCopy.center)
 
             #blitting the rotated images to its rectangle
-            screen.blit(leftRotatedImage, leftRect)
+            if (leftCannonHit == True):
+                screen.blit(leftHit, leftRect2)
+            else:
+                screen.blit(leftRotatedImage, leftRect)
 
             #the delay between each shot
             if self.rotatingDelay % 40 == 0:
@@ -1177,7 +1202,7 @@ bg = pygame.image.load("sprites/Misc/City_Background.png")
 #enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 #enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
 #enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
+#enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
 #enemies.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
 #enemies.add(Boss(40))
 
@@ -1274,12 +1299,12 @@ def game():
 
                 dt = clock.tick(fps)
 
-                print player.hp
+               
 
                 toggleButton = ToggleButton(toggleStraight[0])
 
-                #if player.alive():
-                    #shootTime += 1
+                if player.alive():
+                    shootTime += 1
 
                 if (shootTime == 10):
                     player.shoot()
@@ -1364,17 +1389,17 @@ def game():
                 bullets.update(screen, bulletImg)
                 bullets.draw(screen)
 
-                #if level == 1:
-                    #levelOne.draw(screen)
-                    #levelOne.update(screen)
+                if level == 1:
+                    levelOne.draw(screen)
+                    levelOne.update(screen)
 
-                #elif level == 2:
-                    #levelTwo.draw(screen)
-                    #levelTwo.update(screen)
+                elif level == 2:
+                    levelTwo.draw(screen)
+                    levelTwo.update(screen)
 
-                #elif level == 3:
-                    #levelThree.draw(screen)
-                    #levelThree.update(screen)
+                elif level == 3:
+                    levelThree.draw(screen)
+                    levelThree.update(screen)
 
                 #drawing and refreshing enemy bullets list to check for any action in enemy bullet object
                 enemyBullets.draw(screen)
