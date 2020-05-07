@@ -434,7 +434,6 @@ class Enemy(pygame.sprite.Sprite):
                 bullet.kill()
         if (self.hp <= 0):
             self.hitDelay -= 1
-            print self.hitDelay
             if (self.hitDelay >= 0):
                 screen.blit(explosion[count // 6], self.rect)
             else:
