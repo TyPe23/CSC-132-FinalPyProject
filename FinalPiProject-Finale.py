@@ -1269,15 +1269,15 @@ class Boss(pygame.sprite.Sprite):
 			#once the shooting delay reaches 200 and is divisible by ten, then shoot 
             if (self.sprayShootDelay > 200) and (self.sprayShootDelay % 10 == 0):
 
-                    enemyBullet1 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, 0, 5)
-                    enemyBullet2 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -1, 5)    
-                    enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -2, 5)    
-                    enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -3, 5)    
-                    enemyBullet5 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -4, 5)    
-                    enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -5, 5)
-                    enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -6, 5)            
-                    enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
-                self.rightSpray += 1
+                enemyBullet1 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, 0, 5)
+                enemyBullet2 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -1, 5)    
+                enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -2, 5)    
+                enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -3, 5)    
+                enemyBullet5 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -4, 5)    
+                enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -5, 5)
+                enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -6, 5)            
+                enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
+            self.rightSpray += 1
 
         else:
             self.leftSpray = 0
@@ -1618,7 +1618,6 @@ pygame.display.set_caption("FinalPi")
 stickX = (WIDTH - (WIDTH / 6))
 stickY = (HEIGHT - (HEIGHT / 8))
 joystick = Circle(stickX, stickY, TRANSPARENT, 15)
-all_sprites.add(joystick)
 
 #creating the toggle button object
 toggleX = (WIDTH - (5 * WIDTH / 6) - 44)
