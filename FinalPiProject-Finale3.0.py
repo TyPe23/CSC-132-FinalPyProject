@@ -669,6 +669,10 @@ class KamikazeEnemy(Enemy):
 
         screen.blit(kamikaze[count // 6], self.rect)
 
+        if (self.alive() == False):
+                self.x_speed = 0
+                self.y_speed = 0
+
         self.checkCollision()
 
         if (self.rect.top < 0):
