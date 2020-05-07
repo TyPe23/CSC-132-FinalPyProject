@@ -657,6 +657,9 @@ class SplashEnemy(Enemy):
 			#blit the hit sprite to its rectangle 
             screen.blit(sprayHit[count // 6], self.rect)
 
+		#checking for collision 
+		self.checkCollision()
+
 		#if it is no longer alive, do not allow it to move 
         if (self.alive() == False):
                 self.x_speed = 0
@@ -1260,7 +1263,7 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullet7 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 6, 5)            
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
 
-			#increasing the delay of the left cannon shooting 
+			#increasing the delay counter of the left cannon shooting 
             self.leftSpray += 1
 
 		#if the left cannon's shooting delay has reached a certain value, have the right cannon shoot if it is not dead
@@ -1277,6 +1280,8 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -5, 5)
                 enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -6, 5)            
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
+
+			#increasing the delay counter for the right cannon shooting
             self.rightSpray += 1
 
         else:
@@ -1307,7 +1312,7 @@ class Boss(pygame.sprite.Sprite):
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
 
-			#increase the delay of the right cannon shooting 
+			#increase the delay counter of the right cannon shooting 
             self.rightCircular += 1
 
 		#if the right cannon's shooting delay has reached a certain value, have the left cannon shoot if it is not dead 
@@ -1325,7 +1330,7 @@ class Boss(pygame.sprite.Sprite):
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
             
-			#increase the delay of the left cannon shooting 
+			#increase the delay counter of the left cannon shooting 
             self.leftCircular += 1
 
         else:
