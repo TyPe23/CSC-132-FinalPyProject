@@ -434,16 +434,10 @@ class Enemy(pygame.sprite.Sprite):
                 bullet.kill()
         if (self.hp <= 0):
             self.hitDelay -= 1
-            print self.hitDelay
             if (self.hitDelay >= 0):
-                screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.rect)
+                screen.blit(explosion[count // 6], self.rect)
             else:
                 self.kill()
-
-    def explode(self):
-        if self.hitDelay >= 0:
-            screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.rect)
-            self.hitDelay -= 1
 
     def alive(self):
         if (self.hp > 0):
@@ -471,9 +465,10 @@ class NormalEnemy(Enemy):
 
     def update(self, screen):
 
-        screen.blit(normal[count // 6], self.rect)
+        screen.blit(normalInvul[count // 6], self.rect)
 
         if Enemy.evadingEnemyAlive == False:
+            screen.blit(normal[count // 6], self.rect)
             self.checkCollision()
 
         if self.delay <= 0:
@@ -533,6 +528,10 @@ class SplashEnemy(Enemy):
         if (self.hit == True):
             screen.blit(sprayHit[count // 6], self.rect)
 
+        if (self.alive() == False):
+                self.x_speed = 0
+                self.y_speed = 0
+
         if (self.rect.bottom < 400):
             self.rect.y += self.y_speed
 
@@ -543,9 +542,10 @@ class SplashEnemy(Enemy):
         self.hit = False
 
     def shoot(self):
-        enemyBullet1 = EnemyBullet(self.rect.centerx + 23, self.rect.top + self.rect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
-        enemyBullet2 = EnemyBullet(self.rect.centerx - 35, self.rect.top + self.rect.height, 10, 20, random.randint(-2, -0), random.uniform(3.5, 7.5))
-        enemyBullets.add(enemyBullet1, enemyBullet2)
+        if (self.alive() == True):
+            enemyBullet1 = EnemyBullet(self.rect.centerx + 23, self.rect.top + self.rect.height, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
+            enemyBullet2 = EnemyBullet(self.rect.centerx - 35, self.rect.top + self.rect.height, 10, 20, random.randint(-2, -0), random.uniform(3.5, 7.5))
+            enemyBullets.add(enemyBullet1, enemyBullet2)
 
 
 class EvadingEnemy(Enemy):
@@ -568,11 +568,11 @@ class EvadingEnemy(Enemy):
 
         if self.alive() == False:
             Enemy.evadingEnemyAlive = False
+            self.x_speed = 0
+            self.y_speed = 0
 
         global xDist
         xDist = (self.rect.centerx - self.player.rect.centerx)
-
-        self.checkCollision()
 
         self.offScreen()
 
@@ -582,18 +582,20 @@ class EvadingEnemy(Enemy):
         else:
             screen.blit(healer2[count // 6], self.rect)
 
+        self.checkCollision()
+
         if xDist < 0:
             xDist *= -1
 
         if self.rect.top < 300:
-            self.rect.y += 12
+            self.rect.y += 6
 
         if (self.hit == True):
             if (self.rect.top >= 300):
                 screen.blit(healerHit[count // 6], self.rect)
 
             else:
-                screen.blit(healer2Hit[count // 6], self.rect)
+                screen.blit(healerHit2[count // 6], self.rect)
 
         else:
             if (EvadingEnemy.edge == False) and (EvadingEnemy.leftMove == False) and (EvadingEnemy.rightMove == False):
@@ -666,6 +668,10 @@ class KamikazeEnemy(Enemy):
 
         screen.blit(kamikaze[count // 6], self.rect)
 
+        if (self.alive() == False):
+                self.x_speed = 0
+                self.y_speed = 0
+
         self.checkCollision()
 
         if (self.rect.top < 0):
@@ -700,6 +706,9 @@ class Boss(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = -150
         self.hp = hp
+        self.hitDelay = 50
+        self.hitDelay2 = 50
+        self.hitDelay3 = 200
 
         #creating left cannon
         self.leftCannon = pygame.image.load('sprites/Enemies/Boss_Gun.png')
@@ -852,7 +861,7 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6)
                 self.untouchableCannonDelay = 0
 
-            elif (self.untouchableCannonDelay % 50 == 0) and (self.leftCannonHP <= 0) and (self.rightCannonHP <= 0):
+            elif (self.untouchableCannonDelay % 50 == 0) and (self.leftCannonHP <= 0) and (self.rightCannonHP <= 0) and (self.finalHitpointHP > 0):
                 enemyBullet1 = EnemyCircularBullet2(153, 60, 10, 20, -90)
                 enemyBullet2 = EnemyCircularBullet2(153, 60, 10, 20, -110)
                 enemyBullet3 = EnemyCircularBullet2(153, 60, 10, 20, -70)
@@ -891,15 +900,21 @@ class Boss(pygame.sprite.Sprite):
                     leftCannonHit = True
                     bullet.kill()
 
-        if (self.leftCannonHP <= 0):
-            screen.blit(pygame.image.load('sprites/Enemies/Boss_Gun_Broken.png'), self.leftCannonRect)
-
+        if self.leftCannonHP <= 0:
+            screen.blit(brokenGun[count // 6], self.leftCannonRect)
+            if (self.hitDelay >= 0):
+                self.hitDelay -= 1
+                screen.blit(explosion[count // 6], \
+                            (self.leftCannonRect.x - 20, self.leftCannonRect.y))
+                
         if self.rightCannonHP <= 0:
-            screen.blit(pygame.image.load('sprites/Enemies/Boss_Gun_Broken.png'), self.rightCannonRect)
+            screen.blit(brokenGun[count // 6], self.rightCannonRect)
+            if (self.hitDelay2 >= 0):
+                self.hitDelay2 -= 1
+                screen.blit(explosion[count // 6], \
+                            (self.rightCannonRect.x - 20, self.rightCannonRect.y))
 
         if (self.leftCannonHP == 0 and self.rightCannonHP == 0):
-            screen.blit(self.finalHitpoint, self.finalHitpointRect)
-            self.finalHitpoint.fill((0, 0, 100))
             self.attack = 0
             self.wait = 0 
             self.finalHitPointCollision()
@@ -910,12 +925,23 @@ class Boss(pygame.sprite.Sprite):
         for bullet in bullets:
 
             if (self.finalHitpointRect.colliderect(bullet)) and (self.finalHitpointHP > 0):
+                screen.blit(pygame.image.load('sprites/Enemies/Boss_SkullHit.png'), self.rect)
                 self.finalHitpointHP -= 1
                 finalHitPointHit = True
                 bullet.kill()
         
         if self.finalHitpointHP <= 0:
-            self.kill()
+            screen.blit(brokenSkull[count // 6], self.rect)
+            if (self.hitDelay3 >= 0):
+                self.hitDelay3 -= 1
+                screen.blit(explosion[count // 6], \
+                            (self.leftCannonRect.x - 20, self.leftCannonRect.y))
+                screen.blit(explosion[count // 6], \
+                            (self.rightCannonRect.x - 20, self.rightCannonRect.y))
+                screen.blit(explosion[count // 6], \
+                            (random.randint(0, 400), random.randint(0, 100)))
+            else:
+                self.kill()
 
     def splashAttack(self):
 
@@ -1151,15 +1177,23 @@ MAROON = ((115, 0, 0))
 bgCount = 0
 bgCount2 = -1235
 count = 0
+movetime = 0
 right = False
 left = False
 evadingEnemyAlive = False
 leftCannonHit = False
 rightCannonHit = False
+paused = False
+boss = False
+
 
 #loading in bullet images
 bulletImg = pygame.image.load('sprites/Misc/Bullets.png')
 enemyBulletImg = pygame.image.load('sprites/Misc/Enemy_Bullets.png')
+
+# load in explosion images
+explosion = [pygame.image.load('sprites/Misc/Explosion.png'), pygame.image.load('sprites/Misc/Explosion2.png'), \
+             pygame.image.load('sprites/Misc/Explosion3.png'), pygame.image.load('sprites/Misc/Explosion4.png')]
 
 #transparent image
 transparent = pygame.image.load('sprites/Misc/transparent.png')
@@ -1167,14 +1201,21 @@ transparent = pygame.image.load('sprites/Misc/transparent.png')
 #loading in enemy images  
 kamikaze = [pygame.image.load("sprites/Enemies/Kamikaze.png"), pygame.image.load("sprites/Enemies/Kamikaze2.png")]
 kamikazeHit = [pygame.image.load("sprites/Enemies/KamikazeHit.png"), pygame.image.load("sprites/Enemies/Kamikaze2Hit.png")]
+
 normal = [pygame.image.load("sprites/Enemies/Normal.png"),  pygame.image.load("sprites/Enemies/Normal2.png")]
 normalHit = [pygame.image.load("sprites/Enemies/NormalHit.png"),  pygame.image.load("sprites/Enemies/Normal2Hit.png")]
+normalInvul = [pygame.image.load("sprites/Enemies/NormalInvul.png"),  pygame.image.load("sprites/Enemies/Normal2Invul.png")]
+
 spray = [pygame.image.load("sprites/Enemies/Spray.png"), pygame.image.load("sprites/Enemies/Spray2.png")]
 sprayHit = [pygame.image.load("sprites/Enemies/SprayHit.png"), pygame.image.load("sprites/Enemies/Spray2Hit.png")]
+
 healer2 = [pygame.image.load("sprites/Enemies/Healer.png"), pygame.image.load("sprites/Enemies/Healer2.png")]
 healerHit2 = [pygame.image.load("sprites/Enemies/HealerHit.png"), pygame.image.load("sprites/Enemies/Healer2Hit.png")]
 healer = [pygame.image.load("sprites/Enemies/Healer3.png"), pygame.image.load("sprites/Enemies/Healer4.png")]
 healerHit = [pygame.image.load("sprites/Enemies/Healer3Hit.png"), pygame.image.load("sprites/Enemies/Healer4Hit.png")]
+
+brokenGun = [pygame.image.load("sprites/Enemies/Boss_Gun_Broken.png"), pygame.image.load("sprites/Enemies/Boss_Gun_Broken2.png")]
+brokenSkull = [pygame.image.load("sprites/Enemies/Boss_Skull_Broken.png"), pygame.image.load("sprites/Enemies/Boss_Skull_Broken2.png")]
 
 #loading in the start images
 startButtonImg = pygame.image.load('sprites/Misc/FinalPi2.png')
@@ -1229,15 +1270,39 @@ enemySprites = [kamikaze, normal, spray, healer]
 #creating level system
 levelOne = pygame.sprite.Group()
 levelOne.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelOne.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelOne.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
 
 levelTwo = pygame.sprite.Group()
-levelTwo.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
-levelTwo.add(SplashEnemy(enemySprites[2], 30, 0, 3))
+levelTwo.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelTwo.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelTwo.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
 
 levelThree = pygame.sprite.Group()
-levelThree.add(Boss(40))
+levelThree.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
+
+levelFour = pygame.sprite.Group()
+levelFour.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelFour.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelFour.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
+
+levelFive = pygame.sprite.Group()
+levelFive.add((SplashEnemy(enemySprites[2], 30, 0, 6)))
+
+levelSix = pygame.sprite.Group()
+levelSix.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelSix.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelSix.add((SplashEnemy(enemySprites[2], 30, 0, 6)))
+
+levelSeven = pygame.sprite.Group()
+levelSeven.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelSeven.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
+
+levelEight = pygame.sprite.Group()
+levelEight.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelEight.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelEight.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
+
+bossLevel = pygame.sprite.Group()
+bossLevel.add(Boss(40))
 
 # background
 bg = pygame.image.load("sprites/Misc/City_Background.png")
@@ -1253,7 +1318,7 @@ bg = pygame.image.load("sprites/Misc/City_Background.png")
 
 clock = pygame.time.Clock()
 
-pygame.display.set_caption("First Game")
+pygame.display.set_caption("FinalPi")
 
 #creating joystick object
 stickX = (WIDTH - (WIDTH / 6))
@@ -1269,9 +1334,11 @@ toggleButton = Button(None, 56, 44, toggleX, toggleY)
 #function that will check if mouse is over the joystick
 within = (lambda x, low, high: low <= x <= high)
 
-paused = False
+#titleMusic = pygame.mixer.music.load("Final Pi Music/title-1.wav")
+#waveMusic = pygame.mixer.music.load("Final Pi Music/wave-1.wav")
+#bossMusic = pygame.mixer.music.load("Final Pi Music/boss-1.wav")
+buttonSound = pygame.mixer.Sound("Final Pi Music/buttonPush.wav")
 
-movetime = 0
 
 
 def menu():
@@ -1283,13 +1350,21 @@ def menu():
         
     startButton = StartButton(startButtonImg)
 
+    pygame.mixer.music.load("Final Pi Music/title-1.wav")
+
+    pygame.mixer.music.play(-1)
+
     while (menu == True):
 
         try:
+            # redraw the background
             screen.blit(bg, (0, bgCount))
             screen.blit(bg, (0, bgCount2))
+            # increment the y position of the background
             bgCount += 3
             bgCount2 += 3
+            # reset the y positions of the background
+            # to above the other background once off-screen
             if (bgCount >= 720):
                 bgCount = bgCount2 - 1235
 
@@ -1302,6 +1377,8 @@ def menu():
                     menu = False
 
                 if (startButton.clicked()):
+                    buttonSound.play()
+                    pygame.mixer.music.load("Final Pi Music/wave-1.wav")
                     menu = False
                     game()
                         
@@ -1324,6 +1401,7 @@ def game():
     global bgCount
     global bgCount2
     global dt
+    global boss
 
     #will count the delay between each shot
     shootTime = 0
@@ -1334,16 +1412,27 @@ def game():
     #boolean that will control the state of the game (running or not running)
     running = True
 
-    level = 3
+    # select the beginning level(default is 1 to play the full game)
+    level = 9
+
+    pygame.mixer.music.play(-1)
+
+    if (level == 9):
+        pygame.mixer.music.load("Final Pi Music/boss-1.wav")
 
     #main game loop
     while (running == True):
+
+        if (level == 9 and boss == False):
+            pygame.mixer.music.load("Final Pi Music/boss-1.wav")
+            pygame.mixer.music.play(-1)
+            boss = True
 
         #Will add pause function later 
         if (paused == False):
 
                 dt = clock.tick(fps)
-
+                
                 toggleButton = ToggleButton(toggleStraight[0])
 
                 if player.alive():
@@ -1371,12 +1460,14 @@ def game():
                             if ((within(pos[0], *joystick.x_boundary)
                                 and within(pos[1], *joystick.y_boundary))):
                                 selected = True
-                            
+                            # toggle from straight shot to V shot
                             if toggleButton.clicked() and Player.straightShot == True:
+                                buttonSound.play()
                                 Player.straightShot = False
                                 Player.vShot = True
-
+                            # toggle from V shot to straight shot
                             elif toggleButton.clicked() and Player.vShot == True:
+                                buttonSound.play()
                                 Player.vShot = False 
                                 Player.straightShot = True
 
@@ -1411,26 +1502,22 @@ def game():
                     joystick.pos = (stickX, stickY)
                     joystick.recalc_boundary()
 
-                # redraw the window
+                # redraw the background
                 screen.blit(bg, (0, bgCount))
                 screen.blit(bg, (0, bgCount2))
+                # increment the y position of the background
                 bgCount += 3
                 bgCount2 += 3
+                # reset the y positions of the background
+                # to above the other background once off-screen
                 if (bgCount >= 720):
                     bgCount = bgCount2 - 1235
 
                 if (bgCount2 >= 720):
                     bgCount2 = bgCount -1235
 
-
-                toggleButton.update(screen)
-
                 #refreshing the player to check for any action
                 playerObj.update(screen)
-                        
-                #drawing and refreshing the bullets list to check for any action in bullet object
-                bullets.update(screen, bulletImg)
-                bullets.draw(screen)
 
                 if level == 1:
                     levelOne.draw(screen)
@@ -1444,60 +1531,121 @@ def game():
                     levelThree.draw(screen)
                     levelThree.update(screen)
 
+                elif level == 4:
+                    levelFour.draw(screen)
+                    levelFour.update(screen)
+
+                elif level == 5:
+                    levelFive.draw(screen)
+                    levelFive.update(screen)
+
+                elif level == 6:
+                    levelSix.draw(screen)
+                    levelSix.update(screen)
+
+                elif level == 7:
+                    levelSeven.draw(screen)
+                    levelSeven.update(screen)
+
+                elif level == 8:
+                    levelEight.draw(screen)
+                    levelEight.update(screen)
+
+                elif level == 9:
+                    bossLevel.draw(screen)
+                    bossLevel.update(screen)
+
                 #drawing and refreshing enemy bullets list to check for any action in enemy bullet object
                 enemyBullets.draw(screen)
                 enemyBullets.update(screen, enemyBulletImg)
 
-                screen.blit(joystick.image, joystick.rect)
-                
-                if player.alive():
+                #drawing and refreshing the bullets list to check for any action in bullet object
+                bullets.update(screen, bulletImg)
+                bullets.draw(screen)
 
+                # blit the UI
+                # joystick
+                screen.blit(joystick.image, joystick.rect)
+
+                # arrows
+                screen.blit(rightImg, (stickX + 20, stickY - 15))
+                screen.blit(leftImg, (stickX - 55, stickY - 15))
+                screen.blit(upImg, (stickX - 15, stickY - 55))
+                screen.blit(downImg, (stickX - 15, stickY + 20))
+
+                # toggle
+                toggleButton.update(screen)
+                
+                # health bar
+                screen.blit(health[player.hp], (stickX, stickY - 300))
+
+                # if the player is alive display the proper animation
+                if player.alive():
+                    # if the player is hit, have the player sprite flash during iFrames
                     if player.hit == True:
                         if player.hitDelay % 2 == 0:
+                            # if not moving left or right
                             if (left == False and right == False):
                                 screen.blit(char[count // 6], player.rect)
-
+                            # if character moving left
                             elif (left == True):
                                  screen.blit(charLeft[count // 6], player.rect)
-
+                            # if character moving right
                             elif (right == True):
                                 screen.blit(charRight[count // 6], player.rect)
 
+                    # if the player has not been hit, display the sprites normally
+                    # if not moving left or right
                     elif (left == False and right == False):
                         screen.blit(char[count // 6], player.rect)
-
+                    # if character moving left
                     elif (left == True):
                          screen.blit(charLeft[count // 6], player.rect)
-
+                    # if character moving right
                     elif (right == True):
                         screen.blit(charRight[count // 6], player.rect)
-                        
+
+                    # reset the count to prevent errors from exceeding list length   
                     if (count + 1 >= 12):
                         count = 0
-
+                    # increment the count to display the next sprite in the lists
                     count += 1
 
+                    # reset the left and right values to false
                     left = False
                     right = False
-
+                
                 if len(levelOne) <= 0:
                     level = 2
 
                 if len(levelTwo) <= 0:
                     level = 3
 
-                screen.blit(rightImg, (stickX + 20, stickY - 15))
-                screen.blit(leftImg, (stickX - 55, stickY - 15))
-                screen.blit(upImg, (stickX - 15, stickY - 55))
-                screen.blit(downImg, (stickX - 15, stickY + 20))
+                if len(levelThree) <= 0:
+                    level = 4
 
-                screen.blit(health[player.hp], (stickX, stickY - 300))
+                if len(levelFour) <= 0:
+                    level = 5
 
+                if len(levelFive) <= 0:
+                    level = 6
+
+                if len(levelSix) <= 0:
+                    level = 7
+
+                if len(levelSeven) <= 0:
+                    level = 8
+
+                if len(levelEight) <= 0:
+                    level = 9
+
+                # update the display
                 pygame.display.update()
 
         elif (paused == True):
             pause()
 
     pygame.quit()
-
+    
+# start the game by initializing the menu function
 menu()
