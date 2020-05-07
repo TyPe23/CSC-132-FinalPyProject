@@ -1347,6 +1347,7 @@ def menu():
                     menu = False
 
                 if (startButton.clicked()):
+                    buttonSound.play()
                     pygame.mixer.music.load("Final Pi Music/wave-1.wav")
                     menu = False
                     game()
@@ -1431,10 +1432,12 @@ def game():
                                 selected = True
                             # toggle from straight shot to V shot
                             if toggleButton.clicked() and Player.straightShot == True:
+                                buttonSound.play()
                                 Player.straightShot = False
                                 Player.vShot = True
                             # toggle from V shot to straight shot
                             elif toggleButton.clicked() and Player.vShot == True:
+                                buttonSound.play()
                                 Player.vShot = False 
                                 Player.straightShot = True
 
