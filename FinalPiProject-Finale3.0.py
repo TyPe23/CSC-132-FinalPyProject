@@ -902,14 +902,14 @@ class Boss(pygame.sprite.Sprite):
                     bullet.kill()
 
         if self.leftCannonHP <= 0:
-            screen.blit(pygame.image.load('sprites/Enemies/Boss_Gun_Broken.png'), self.leftCannonRect)
+            screen.blit(brokenGun[count // 6], self.leftCannonRect)
             if (self.hitDelay >= 0):
                 self.hitDelay -= 1
                 screen.blit(explosion[count // 6], \
                             (self.leftCannonRect.x - 20, self.leftCannonRect.y))
                 
         if self.rightCannonHP <= 0:
-            screen.blit(pygame.image.load('sprites/Enemies/Boss_Gun_Broken.png'), self.rightCannonRect)
+            screen.blit(brokenGun[count // 6], self.rightCannonRect)
             if (self.hitDelay2 >= 0):
                 self.hitDelay2 -= 1
                 screen.blit(explosion[count // 6], \
@@ -932,6 +932,7 @@ class Boss(pygame.sprite.Sprite):
                 bullet.kill()
         
         if self.finalHitpointHP <= 0:
+            screen.blit(brokenSkull[count // 6], self.rect)
             if (self.hitDelay3 >= 0):
                 self.hitDelay3 -= 1
                 screen.blit(explosion[count // 6], \
@@ -1213,6 +1214,9 @@ healer2 = [pygame.image.load("sprites/Enemies/Healer.png"), pygame.image.load("s
 healerHit2 = [pygame.image.load("sprites/Enemies/HealerHit.png"), pygame.image.load("sprites/Enemies/Healer2Hit.png")]
 healer = [pygame.image.load("sprites/Enemies/Healer3.png"), pygame.image.load("sprites/Enemies/Healer4.png")]
 healerHit = [pygame.image.load("sprites/Enemies/Healer3Hit.png"), pygame.image.load("sprites/Enemies/Healer4Hit.png")]
+
+brokenGun = [pygame.image.load("sprites/Enemies/Boss_Gun_Broken.png"), pygame.image.load("sprites/Enemies/Boss_Gun_Broken2.png")]
+brokenSkull = [pygame.image.load("sprites/Enemies/Boss_Skull_Broken.png"), pygame.image.load("sprites/Enemies/Boss_Skull_Broken2.png")]
 
 #loading in the start images
 startButtonImg = pygame.image.load('sprites/Misc/FinalPi2.png')
