@@ -706,7 +706,7 @@ class EvadingEnemy(Enemy):
     def __init__(self, sprite, hp, x_speed, y_speed, player):       
         Enemy.__init__(self, sprite, hp, x_speed, y_speed, pygame.Surface((72, 80)).convert_alpha())
         self.sprite = sprite
-        self.hp = 10
+        self.hp = hp
         self.x_speed = x_speed
         self.y_speed = y_speed
         self.player = player
@@ -932,7 +932,7 @@ class Boss(pygame.sprite.Sprite):
         self.leftCannonRect.y = self.rect.height
         self.leftCannonAngleSpeed = 1
         self.leftCannonCopy = self.leftCannon
-        self.leftCannonHP = 30
+        self.leftCannonHP = self.hp
 
         # creating right cannon
         self.rightCannon = pygame.image.load("sprites/Enemies/Boss_Gun.png")
@@ -941,14 +941,14 @@ class Boss(pygame.sprite.Sprite):
         self.rightCannonRect.y = self.rect.height 
         self.rightCannonAngleSpeed = -1
         self.rightCannonCopy = self.rightCannon
-        self.rightCannonHP = 30
+        self.rightCannonHP = self.hp
 
         # creating the final hit point once both cannons are dead
         self.finalHitpoint = pygame.Surface((138, 98))
         self.finalHitpointRect = self.finalHitpoint.get_rect()
         self.finalHitpointRect.left = 172
         self.finalHitpointRect.y = self.rect.y - 20
-        self.finalHitpointHP = 100
+        self.finalHitpointHP = self.hp / 2
 
         # time to wait between each attack
         self.wait = 0
@@ -1571,52 +1571,52 @@ enemySprites = [kamikaze, normal, spray, healer]
 
 # creating level system
 levelOne = pygame.sprite.Group()
-levelOne.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelOne.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
 
 levelTwo = pygame.sprite.Group()
-levelTwo.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelTwo.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelTwo.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
+levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
 
 levelThree = pygame.sprite.Group()
-levelThree.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
+levelThree.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
 
 levelFour = pygame.sprite.Group()
-levelFour.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelFour.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelFour.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
+levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelFour.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
 
 levelFive = pygame.sprite.Group()
-levelFive.add((SplashEnemy(enemySprites[2], 30, 0, 6)))
+levelFive.add((SplashEnemy(enemySprites[2], 60, 0, 6)))
 
 levelSix = pygame.sprite.Group()
-levelSix.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelSix.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelSix.add((SplashEnemy(enemySprites[2], 30, 0, 6)))
+levelSix.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelSix.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelSix.add((SplashEnemy(enemySprites[2], 60, 0, 6)))
 
 levelSeven = pygame.sprite.Group()
-levelSeven.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelSeven.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
+levelSeven.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelSeven.add(EvadingEnemy(enemySprites[3], 30, 5, 5, player))
 
 levelEight = pygame.sprite.Group()
-levelEight.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelEight.add((NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6))))
-levelEight.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
+levelEight.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelEight.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+levelEight.add(EvadingEnemy(enemySprites[3], 30, 5, 5, player))
 
 bossLevel = pygame.sprite.Group()
-bossLevel.add(Boss(40))
+bossLevel.add(Boss(100))
 
 # background
 bg = pygame.image.load("sprites/Misc/City_Background.png")
 
 '''uncomment the line that contains the enemy you want to spawn'''
-#enemies.add(KamikazeEnemy(enemySprites[0], 10, 3, 3, player))
-#enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-#enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-#enemies.add(NormalEnemy(enemySprites[1], 15, random.randint(-6, 6), random.randint(-6, 6)))
-#enemies.add(SplashEnemy(enemySprites[2], 30, 0, 6))
-#enemies.add(EvadingEnemy(enemySprites[3], 10, 5, 5, player))
-#enemies.add(Boss(40))
+#enemies.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
+#enemies.add(NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6)))
+#enemies.add(NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6)))
+#enemies.add(NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6)))
+#enemies.add(SplashEnemy(enemySprites[2], 60, 0, 6))
+#enemies.add(EvadingEnemy(enemySprites[3], 60, 5, 5, player))
+#enemies.add(Boss(100))
 
 clock = pygame.time.Clock()
 
@@ -1718,7 +1718,7 @@ def game():
     running = True
 
     # select the beginning level(default is 1 to play the full game)
-    level = 1
+    level = 7
 
     pygame.mixer.music.play(-1)
 
@@ -1827,6 +1827,8 @@ def game():
                 if (level == 1):
                     levelOne.draw(screen)
                     levelOne.update(screen)
+                    if (player.hp < 10):
+                        player.hp += 1
 
                 elif (level == 2):
                     levelTwo.draw(screen)
@@ -1835,7 +1837,7 @@ def game():
                 elif (level == 3):
                     levelThree.draw(screen)
                     levelThree.update(screen)
-                    if (player.hp < 10):
+                    if (player.hp < 8):
                         player.hp += 1
                     
 
@@ -1846,7 +1848,7 @@ def game():
                 elif (level == 5):
                     levelFive.draw(screen)
                     levelFive.update(screen)
-                    if (player.hp < 8):
+                    if (player.hp < 6):
                         player.hp += 1
 
                 elif (level == 6):
@@ -1856,7 +1858,7 @@ def game():
                 elif (level == 7):
                     levelSeven.draw(screen)
                     levelSeven.update(screen)
-                    if (player.hp < 6):
+                    if (player.hp < 4):
                         player.hp += 1
 
                 elif (level == 8):
