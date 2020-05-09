@@ -46,11 +46,11 @@ class StartButton(Button):
 
         mouse_pos = pygame.mouse.get_pos()
 
-	# if the mouse is over the start button then shade it 
+    # if the mouse is over the start button then shade it 
         if (self.rect.collidepoint(mouse_pos)):
             screen.blit(selectedStartButtonImg, self.rect)
 
-	# else do not shade it 
+    # else do not shade it 
         else:
             screen.blit(self.sprite, self.rect)
 
@@ -65,7 +65,7 @@ class ToggleButton(Button):
 
         mouse_pos = pygame.mouse.get_pos()
 
-	# shading the straight shot toggle button based on mouse position
+    # shading the straight shot toggle button based on mouse position
         if (Player.straightShot == True):
 
             # if the mouse is over the button, shade it
@@ -74,18 +74,18 @@ class ToggleButton(Button):
                 screen.blit(toggleStraight[1], self.rect)
 
             # if the mouse is not over the button, do not shade it
-            else:		 
+            else:         
                 screen.blit(toggleStraight[0], self.rect)
 
-	# shading the v shot toggle button based on mouse position
+    # shading the v shot toggle button based on mouse position
         if (Player.vShot == True):
 
             # if the mouse is over the button, shade it
-            if (self.rect.collidepoint(mouse_pos)):		
+            if (self.rect.collidepoint(mouse_pos)):        
                 screen.blit(toggleWide[1], self.rect)
 
             # if the mouse is not over the button, do not shade it
-            else:		 
+            else:         
                 screen.blit(toggleWide[0], self.rect)
 
 # class that will create the player 
@@ -123,16 +123,16 @@ class Player(pygame.sprite.Sprite):
         if (self.rect.bottom < HEIGHT - 150):
             self.spawn = True
 
-	# if the player is not hit check for collision
-        if (Player.hit == False):
-            self.checkCollision()
+    # if the player is not hit check for collision
+        #if (Player.hit == False):
+            #self.checkCollision()
             
         
-	# else have a delay before checking collision again
-        else:
-            self.iFrame()
+    # else have a delay before checking collision again
+        #else:
+            #self.iFrame()
 
-        pygame.draw.rect(screen, (255, 0, 0), self.rect)
+        #pygame.draw.rect(screen, (255, 0, 0), self.rect)
         
         # creating all the buttons 
         downButton = Button([(stickX - 20, stickY + 30), (stickX, stickY + 70), (stickX + 20, stickY + 30)], 80, 0, stickX - 10, stickY + 20)
@@ -140,7 +140,7 @@ class Player(pygame.sprite.Sprite):
         upButton = Button([(stickX - 20, stickY - 30), (stickX, stickY - 70), (stickX + 20, stickY - 30)], 80, 0, stickX - 10, stickY - 20)
         leftButton = Button([(stickX - 70, stickY), (stickX - 30, stickY - 20), (stickX - 30, stickY + 20)], 0, 80, stickX - 20, stickY - 10)
 
-	# load the correct toggle image 
+    # load the correct toggle image 
         if (Player.straightShot == True):
             toggleImg = pygame.image.load("sprites/Joystick/DownArrow.png")
 
@@ -188,7 +188,7 @@ class Player(pygame.sprite.Sprite):
     # function that creates a bullet object 
     def shoot(self):
         
-	# shoot in a straight line if straightShot is true
+    # shoot in a straight line if straightShot is true
         if ((self.rect.bottom <= HEIGHT - 30) and (Player.straightShot == True)):
             bullet1 = Bullet(self.rect.x + 30, self.rect.y - 7, 12, 14, 0, -11)
             bullet2 = Bullet(self.rect.x - 3, self.rect.y - 7, 12, 14, 0, -11)
@@ -196,7 +196,7 @@ class Player(pygame.sprite.Sprite):
             bullet4 = Bullet(self.rect.x - 10, self.rect.y - 7, 12, 14, 0, -11)
             bullets.add(bullet1, bullet2, bullet3, bullet4)
 
-	# else shoot in a v shape if vShot is true
+    # else shoot in a v shape if vShot is true
         elif ((self.rect.bottom <= HEIGHT - 30) and (Player.vShot == True)):
             bullet1 = Bullet(self.rect.x + 30, self.rect.y - 7, 12, 14, 0, -11)
             bullet2 = Bullet(self.rect.x - 3, self.rect.y - 7, 12, 14, 0, -11)
@@ -207,29 +207,29 @@ class Player(pygame.sprite.Sprite):
     # function that checks for collision regarding the player 
     def checkCollision(self):
 
-	# for every enemy bullet that is currently on the screen
+    # for every enemy bullet that is currently on the screen
         for bullet in enemyBullets:
 
-	    # if any of the bullets collide with the player 
+        # if any of the bullets collide with the player 
             if (pygame.sprite.collide_rect(self, bullet)):
 
-		# if the player is not dead
+        # if the player is not dead
                 if (self.hp > 0):
 
-		    # decrease player health by 1 
+            # decrease player health by 1 
                     self.hp -= 1
 
-		    # kill the bullet that hit the player 
+            # kill the bullet that hit the player 
                     bullet.kill()
 
-		    # indicate that the player has been hit
+            # indicate that the player has been hit
                     Player.hit = True
 
-	# if the player hp is zero
+    # if the player hp is zero
         if (self.hp <= 0):
 
-		# kill the player 
-        	self.kill()
+        # kill the player 
+            self.kill()
 
     # function to check if the player is alive 
     def alive(self):
@@ -243,16 +243,16 @@ class Player(pygame.sprite.Sprite):
     # the player will not take damage until the delay is over
     def iFrame(self):
 
-	# incrementing the delay
+    # incrementing the delay
         self.hitDelay += 1
         
-	# once the delay reaches a certain value
+    # once the delay reaches a certain value
         if (self.hitDelay >= 250):
 
-	    # allow the player to check for collision again
+        # allow the player to check for collision again
             Player.hit = False
 
-	    # reset the delay 
+        # reset the delay 
             self.hitDelay = 0
 
 # class that creates a basic bullet 
@@ -298,14 +298,14 @@ class EnemyBullet(pygame.sprite.Sprite):
         # blit the given sprite to the bullet rect
         screen.blit(enemyBulletImg, self.rect)
 
-	# check if the bullet has gone offscreen
+    # check if the bullet has gone offscreen
         self.offScreen()
                 
         # make it shoot upwards
         self.rect.x +=  self.x_speed
         self.rect.y += self.y_speed
 
-	# function that checks whether the bullet has gone off the screen
+    # function that checks whether the bullet has gone off the screen
     def offScreen(self):
 
         # if bullet goes off the screen then kill it
@@ -347,11 +347,11 @@ class EnemyCircularBullet(pygame.sprite.Sprite):
         # check if the bullet is off the screen
         self.offScreen()
 
-	# change the bullet's position according to its speed
+    # change the bullet's position according to its speed
         self.posx += self.x_speed
         self.posy += self.y_speed
 
-	# change the bullet's actual position with previously calculated values  
+    # change the bullet's actual position with previously calculated values  
         self.rect.center = (self.posx, self.posy)
 
     # function that checks if the bullet has gone off the screen
@@ -396,14 +396,14 @@ class EnemyCircularBullet2(pygame.sprite.Sprite):
         # check if the bullet is off the screen
         self.offScreen()
 
-	# change the bullet's position according to its speed
+    # change the bullet's position according to its speed
         self.posx += self.x_speed
         self.posy += self.y_speed
 
-	# change the bullet's actual position with previously calculated values 		
+    # change the bullet's actual position with previously calculated values         
         self.rect.center = (self.posx, self.posy)
 
-	# function that checks if the bullet has gone off the screen
+    # function that checks if the bullet has gone off the screen
     def offScreen(self):
 
         #if bullet goes off the screen then kill it
@@ -433,16 +433,16 @@ class EnemyRotatingBullet(pygame.sprite.Sprite):
     # updates the collision and position
     def update(self, screen, enemyBulletImg):
 
-	# blit the bullet image to its rectangle
+    # blit the bullet image to its rectangle
         screen.blit(enemyBulletImg, self.rect)
         
-	# check if the bullet has gone off the screen
+    # check if the bullet has gone off the screen
         self.offScreen()
 
-	# change the bullet's position based of the given direction
+    # change the bullet's position based of the given direction
         self.pos += self.direction * (self.dt / 3)
 
-	# change the bullet's actual position based off the previously calculated values
+    # change the bullet's actual position based off the previously calculated values
         self.rect.center = self.pos
 
     # function that checks if the bullet has gone off the screen
@@ -505,40 +505,40 @@ class Enemy(pygame.sprite.Sprite):
     # function that checks for bullet collision with the enemy 
     def checkCollision(self):
 
-	# for every bullet that is created by the player and is on the screen
+    # for every bullet that is created by the player and is on the screen
         for bullet in bullets:
 
-		# if any of the bullets collide with the enemy
+        # if any of the bullets collide with the enemy
             if (pygame.sprite.collide_rect(self, bullet)):
 
-		# if the enemy is not dead 
+        # if the enemy is not dead 
                 if (self.hp > 0):
 
-		    # decrease its health by one 
+            # decrease its health by one 
                     self.hp -= 1
 
-		    # indicate that it has been hit
+            # indicate that it has been hit
                     self.hit = True
 
-		# kill the bullet that hit it
+        # kill the bullet that hit it
                 bullet.kill()
 
-	# if the enemy is dead 
+    # if the enemy is dead 
         if (self.hp <= 0):
 
-	    #start the decrementing the hit delay 
+        #start the decrementing the hit delay 
             self.hitDelay -= 1
 
-	    # while the hit delay is not below zero
+        # while the hit delay is not below zero
             if (self.hitDelay >= 0):
 
-		#show the explosion animations 
+        #show the explosion animations 
                 screen.blit(explosion[count // 6], self.rect)
 
-	    # once the delay reaches below zero 
+        # once the delay reaches below zero 
             else:
 
-		#kill itself
+        #kill itself
                 self.kill()
 
     # function that checks if the enemy is alive
@@ -568,75 +568,75 @@ class NormalEnemy(Enemy):
     # updates the health, collision and position
     def update(self, screen):
 
-	# if the evading enemy is alive, blit the invulnerable sprite to its rectangle 
+    # if the evading enemy is alive, blit the invulnerable sprite to its rectangle 
         screen.blit(normalInvul[count // 6], self.rect)
 
-	# if the evading enemy is dead 
+    # if the evading enemy is dead 
         if (Enemy.evadingEnemyAlive == False):
 
-	    # blit the normal sprite to its rectangle 
+        # blit the normal sprite to its rectangle 
             screen.blit(normal[count // 6], self.rect)
 
-	    # check for collision
+        # check for collision
             self.checkCollision()
 
-	# increment the move delay
+    # increment the move delay
         if (self.delay <= 0):
             self.delay += 1
             
-	# once the move delay reaches a certain value, allow it to move 
+    # once the move delay reaches a certain value, allow it to move 
         elif ((self.rect.top < 0) and (self.delay >= 0)):
 
-	    # cannot be hit while it is not on the screen
+        # cannot be hit while it is not on the screen
             self.hit = False
 
             self.rect.y += 6
             
         else:
 
-	    # if it has been hit
+        # if it has been hit
             if (self.hit == True):
 
-		# blit the hit sprite 
+        # blit the hit sprite 
                 screen.blit(normalHit[count // 6], self.rect)
 
-	    # if it is dead, do not allow it to move 
+        # if it is dead, do not allow it to move 
             if (self.alive() == False):
                 self.x_speed = 0
                 self.y_speed = 0
 
-	    # consistently shooting while it is on the screen and alive 
+        # consistently shooting while it is on the screen and alive 
             self.shoot()
 
-	    # having it move based on its direction and speed 
+        # having it move based on its direction and speed 
             self.rect.x += self.x_speed * self.xdirection
             self.rect.y += self.y_speed * self.ydirection
 
-	    # if it hits the side of the screen
+        # if it hits the side of the screen
             if ((self.rect.left <= 0) or (self.rect.left + self.rect.width >= WIDTH)):
 
-		# flip its x direction
+        # flip its x direction
                 self.xdirection *= -1
 
-		# pick a random y speed
+        # pick a random y speed
                 self.y_speed = random.uniform(3, 6)
 
-	    # if it hits the top of the screen or the bottom barrier 
+        # if it hits the top of the screen or the bottom barrier 
             if ((self.rect.bottom > 450) or (self.rect.top <= 0)): 
 
-		# flip its y direction
+        # flip its y direction
                 self.ydirection *= -1
 
-		# pick a random x speed 
+        # pick a random x speed 
                 self.x_speed = random.uniform(3, 6)
 
-	# always setting the default value of hit to be false
+    # always setting the default value of hit to be false
         self.hit = False
 
     # function that allows the normal enemy to shoot           
     def shoot(self):
 
-	# if the random number generated is 0 and it is alive then shoot  
+    # if the random number generated is 0 and it is alive then shoot  
         if (random.randrange(20) == 0 and self.alive() == True):
             enemyBullet = EnemyBullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, 0, 6)
             enemyBullets.add(enemyBullet)
@@ -654,36 +654,36 @@ class SplashEnemy(Enemy):
     # updates the health, collision and position
     def update(self, screen):
 
-	# blit its sprite to its rectangle
+    # blit its sprite to its rectangle
         screen.blit(spray[count // 6], self.rect)
 
         # checking for collision
         self.checkCollision()
 
-	# if it has been hit
+    # if it has been hit
         if (self.hit == True):
 
-	    # blit the hit sprite to its rectangle 
+        # blit the hit sprite to its rectangle 
             screen.blit(sprayHit[count // 6], self.rect)
 
-	# if it is no longer alive, do not allow it to move 
+    # if it is no longer alive, do not allow it to move 
         if (self.alive() == False):
                 self.x_speed = 0
                 self.y_speed = 0
 
-	# if it has not reached its destination
+    # if it has not reached its destination
         if (self.rect.bottom < 400):
             self.rect.y += self.y_speed
 
         else:
 
-	    # do not allow it to move 
+        # do not allow it to move 
             self.rect.y += 0
 
-	    # have it consistenly shoot while it is alive 
+        # have it consistenly shoot while it is alive 
             self.shoot()
 
-	# setting the default value of hit to be false 
+    # setting the default value of hit to be false 
         self.hit = False
 
     # function that allows the splash enemy to shoot 
@@ -714,47 +714,47 @@ class EvadingEnemy(Enemy):
     # updates the health, collision and position
     def update(self, screen):
 
-	# upon its instantiation, indicate it is alive 
+    # upon its instantiation, indicate it is alive 
         Enemy.evadingEnemyAlive = True
 
-	# when it dies indicate it has died and do not allow it to move 
+    # when it dies indicate it has died and do not allow it to move 
         if (self.alive() == False):
             Enemy.evadingEnemyAlive = False
             self.x_speed = 0
             self.y_speed = 0
 
-	# variable that calculates the x distance between the healer and the player 
+    # variable that calculates the x distance between the healer and the player 
         global xDist
         xDist = (self.rect.centerx - self.player.rect.centerx)
 
-	# checking if the healer has hit the edge of the screen
+    # checking if the healer has hit the edge of the screen
         self.offScreen()
 
-	# if it has reached its destination
+    # if it has reached its destination
         if (self.rect.top >= 300):
 
-	    #blit the default healer sprite
+        #blit the default healer sprite
             screen.blit(healer[count // 6], self.rect)
 
-	# until it reaches its destination
+    # until it reaches its destination
         else:
 
-	    # blit the moving healer sprite 
+        # blit the moving healer sprite 
             screen.blit(healer2[count // 6], self.rect)
 
-	# checking for collision
+    # checking for collision
         self.checkCollision()
 
-	# if the x distance between the healer and player is less than zero
+    # if the x distance between the healer and player is less than zero
         if (xDist < 0):
 
-	    # have the healer move in the opposite direction
+        # have the healer move in the opposite direction
             xDist *= -1
 
-	# if it has not reached its destination
+    # if it has not reached its destination
         if (self.rect.top < 300):
 
-	    #change its y position
+        #change its y position
             self.rect.y += 6
 
         # if it has been hit 
@@ -763,10 +763,10 @@ class EvadingEnemy(Enemy):
             # if it has reached its destination
             if (self.rect.top >= 300):
 
-		# blit the hit sprite for the default healer sprite 
+        # blit the hit sprite for the default healer sprite 
                 screen.blit(healerHit[count // 6], self.rect)
 
-	    # if it is still moving 
+        # if it is still moving 
             else:
 
                 # blit the hit sprite for the moving healer sprite 
@@ -774,63 +774,63 @@ class EvadingEnemy(Enemy):
 
         else:
 
-	    # if it has not hit the edge
+        # if it has not hit the edge
             if ((EvadingEnemy.edge == False) and (EvadingEnemy.leftMove == False) and (EvadingEnemy.rightMove == False)):
 
-		# if the player is to right of the healer and is a certain x distance from the player 
+        # if the player is to right of the healer and is a certain x distance from the player 
                 if ((self.rect.x < self.player.rect.x) and (xDist < 185)):
 
-		    # move to the left 
+            # move to the left 
                     self.rect.x -= self.x_speed
             
-		# if the player is to left of the healer and is a certain x distance from the player 
+        # if the player is to left of the healer and is a certain x distance from the player 
                 elif ((self.rect.x > self.player.rect.x) and (xDist < 150)):
 
-		    # move to the right 
+            # move to the right 
                     self.rect.x += self.x_speed
 
-	    # indicate the left edge move needs to happen if the healer has hit the left side of the screen
+        # indicate the left edge move needs to happen if the healer has hit the left side of the screen
             elif (EvadingEnemy.edge == True and self.offScreen() == 1):
                 EvadingEnemy.leftMove = True
 
-	    # indicate the right edge move needs to happen if the healer has hit the right side of the screen
+        # indicate the right edge move needs to happen if the healer has hit the right side of the screen
             elif (EvadingEnemy.edge == True and self.offScreen() == 2):
                 EvadingEnemy.rightMove = True
     
-	    # if the left edge move has been triggered 
+        # if the left edge move has been triggered 
             if (EvadingEnemy.leftMove == True):
 
-		# if the player is so far away from the healer then do not move 
+        # if the player is so far away from the healer then do not move 
                 if ((self.rect.left + self.rect.width) < self.player.rect.left):
                     self.rect.x += 0
 
-		# if the player is close enough move accordingly 
+        # if the player is close enough move accordingly 
                 else:
                     self.leftScreenCollison()
 
-	    # if the right edge move has been triggered 
+        # if the right edge move has been triggered 
             elif (EvadingEnemy.rightMove == True):
 
-		# if the player is so far away from the healer then do not move 
+        # if the player is so far away from the healer then do not move 
                 if ((self.player.rect.left + self.player.rect.width) < self.rect.left):
                     self.rect.x += 0
                 
-		# if the player is close enough move accordingly 
+        # if the player is close enough move accordingly 
                 else:
                     self.rightScreenCollison()
 
-	# always setting the default value of hit to be false
+    # always setting the default value of hit to be false
         self.hit = False
 
     # function that checks whether the healer has hit the edge 
     def offScreen(self):
 
-	# return a 1 if the healer hits the left side of the screen
+    # return a 1 if the healer hits the left side of the screen
         if (self.rect.left <= 0):
             EvadingEnemy.edge = True
             return 1
 
-	# return a 2 if the healer has hit the right side of the screen
+    # return a 2 if the healer has hit the right side of the screen
         if(self.rect.left + self.rect.width >= WIDTH):
             EvadingEnemy.edge = True
             return 2
@@ -838,11 +838,11 @@ class EvadingEnemy(Enemy):
     # function that handles the event of the healer hitting the left side of the screen
     def leftScreenCollison(self):
 
-	# move a certain x distance away from the edge
+    # move a certain x distance away from the edge
         if (self.rect.x <= self.rect.width):
             self.rect.x += self.x_speed
 
-	# indicate the healer is no longer on or near the edge 
+    # indicate the healer is no longer on or near the edge 
         else:
             EvadingEnemy.leftMove = False
             EvadingEnemy.edge = False
@@ -850,11 +850,11 @@ class EvadingEnemy(Enemy):
     # function that handles the event of the healer hitting the right side of the screen
     def rightScreenCollison(self):
 
-	# move a certain x distance away from the edge
+    # move a certain x distance away from the edge
         if (self.rect.x >= (WIDTH - (self.rect.width * 2))):
             self.rect.x -= self.x_speed
 
-	# indicate the healer is no longer on or near the edge 
+    # indicate the healer is no longer on or near the edge 
         else:
             EvadingEnemy.rightMove = False
             EvadingEnemy.edge = False
@@ -872,43 +872,43 @@ class KamikazeEnemy(Enemy):
     # updates the health, collision and position
     def update(self, screen):
 
-	# blit the kamikaze sprite to its rectangle
+    # blit the kamikaze sprite to its rectangle
         screen.blit(kamikaze[count // 6], self.rect)
 
-	# if it is no longer alive, do not allow it to move 
+    # if it is no longer alive, do not allow it to move 
         if (self.alive() == False):
                 self.x_speed = 0
                 self.y_speed = 0
 
-	# checking for collision
+    # checking for collision
         self.checkCollision()
 
-	# if it is not on the screen change its y position
+    # if it is not on the screen change its y position
         if (self.rect.top < 0):
             self.rect.y += 6
 
-	# if it has been hit
+    # if it has been hit
         if (self.hit == True):
 
-	    # blit the hit sprite to its rectangle 
+        # blit the hit sprite to its rectangle 
             screen.blit(kamikazeHit[count // 6], self.rect)
 
         else:
-	    # following the player based on the player's x position
+        # following the player based on the player's x position
             if (self.rect.x < self.player.rect.x):
                 self.rect.x += self.x_speed
             
             elif (self.rect.x > self.player.rect.x):
                 self.rect.x -= self.x_speed
                                 
-	    # following the player based on the player's y position
+        # following the player based on the player's y position
             if (self.rect.y < self.player.rect.y):
                 self.rect.y += self.y_speed
             
             elif (self.rect.y > self.player.rect.y):
                 self.rect.y -= self.y_speed
 
-	# always setting the default value of hit to be false 
+    # always setting the default value of hit to be false 
         self.hit = False
 
 # class that creates the boss 
@@ -986,13 +986,13 @@ class Boss(pygame.sprite.Sprite):
         # angle that the cannon will be rotating by during rotating attack
         self.angle = 0
 
-	# delay between each rotating attack shot 
+    # delay between each rotating attack shot 
         self.rotatingDelay = 0
 
         # variable to keep track of how many times surface has rotated 90 degrees
         self.rotateCount = 0
 
-	# delay between the untouchable cannons' attacks
+    # delay between the untouchable cannons' attacks
         self.untouchableCannonDelay = 0
 
     def update(self, screen):
@@ -1001,14 +1001,14 @@ class Boss(pygame.sprite.Sprite):
         global leftCannonHit
         global finalHitPointHit
 
-	# blit the left and right cannons to the screen
+    # blit the left and right cannons to the screen
         screen.blit(self.leftCannon, self.leftCannonRect)
         screen.blit(self.rightCannon, self.rightCannonRect)
         
-	# if the boss has not reached its destination
+    # if the boss has not reached its destination
         if (self.rect.top <= 0):
 
-	    # move itself and every other cannon accordingly 
+        # move itself and every other cannon accordingly 
             self.rect.y += 6
             self.leftCannonRect.y = self.rect.y + 45
             self.rightCannonRect.y = self.rect.y + 45
@@ -1016,41 +1016,41 @@ class Boss(pygame.sprite.Sprite):
 
         else:  
 
-	    # check for collisions with the left and right cannnons 
+        # check for collisions with the left and right cannnons 
             self.cannonCollision(screen)
 
-	    # if the rotating attack is not happening and the left cannon has been hit 
+        # if the rotating attack is not happening and the left cannon has been hit 
             if ((self.attack != 4) and (leftCannonHit == True)):
 
-		    # blit the hit sprite to the left cannon's rectangle 
+            # blit the hit sprite to the left cannon's rectangle 
                     screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.leftCannonRect)
 
-	    # if the rotating attack is not happening and the right cannon has been hit 
+        # if the rotating attack is not happening and the right cannon has been hit 
             elif ((self.attack != 4) and (rightCannonHit == True)):
 
-		    # blit the hit sprite to the right cannon's rectangle
+            # blit the hit sprite to the right cannon's rectangle
                     screen.blit(pygame.image.load('sprites/Enemies/Boss_GunHit.png'), self.rightCannonRect)
 
-	    # incrementing the wait time between each attack
+        # incrementing the wait time between each attack
             self.wait += 1
 
-	    # incrementing the delay between the untouchable cannon attack
+        # incrementing the delay between the untouchable cannon attack
             self.untouchableCannonDelay += 0.5
 
-	    # if the wait value has reached a hundred
+        # if the wait value has reached a hundred
             if (self.wait == 100):
 
-		# choose one of the four attacks randomly 
-                attack = random.randint(1, 4)
+        # choose one of the four attacks randomly 
+                attack = 2 #random.randint(1, 4)
                 
-		# if the attack chosen is the same as the previous attack
+        # if the attack chosen is the same as the previous attack
                 if (attack == self.oldAttack):
                     
-		    # if the attack is four, have it be one
+            # if the attack is four, have it be one
                     if (attack == 4):
                         self.attack = 1
 
-		    # have the attack be whatever the previous attack was plus one 
+            # have the attack be whatever the previous attack was plus one 
                     else:
                         self.attack = self.oldAttack + 1
 
@@ -1066,7 +1066,7 @@ class Boss(pygame.sprite.Sprite):
                 elif (attack == 4):
                     self.attack = 4
                 
-		# keeping track of the attack happening 
+        # keeping track of the attack happening 
                 self.oldAttack = self.attack
 
             if (self.attack == 1):
@@ -1092,8 +1092,8 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6)
                 self.untouchableCannonDelay = 0
 
-	    # having the untouchanle cannons shoot five bullets if both cannons are dead 
-            elif ((self.untouchableCannonDelay % 50 == 0) and (self.leftCannonHP <= 0) and (self.rightCannonHP <= 0) and (self.finalHitpointHP > 0)):
+        # having the untouchable cannons shoot five bullets if both cannons are dead 
+            elif ((self.untouchableCannonDelay % 50 == 0) and (self.leftCannonHP <= 0) and (self.rightCannonHP <=  0) and (self.finalHitpointHP > 0)):
                 enemyBullet1 = EnemyCircularBullet2(153, 60, 10, 20, -90)
                 enemyBullet2 = EnemyCircularBullet2(153, 60, 10, 20, -110)
                 enemyBullet3 = EnemyCircularBullet2(153, 60, 10, 20, -70)
@@ -1107,7 +1107,7 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6,enemyBullet7, enemyBullet8, enemyBullet9, enemyBullet10)
                 self.untouchableCannonDelay = 0
 
-	# always set the default values of hit to be false
+    # always set the default values of hit to be false
         leftCannonHit = False
         rightCannonHit = False
         finalHitPointHit = False
@@ -1118,40 +1118,40 @@ class Boss(pygame.sprite.Sprite):
         global rightCannonHit
         global leftCannonHit
         
-	# for every bullet created by the player that is on the screen
+    # for every bullet created by the player that is on the screen
         for bullet in bullets:
 
-	    # if any bullet collides with the right cannon 
+        # if any bullet collides with the right cannon 
             if (self.rightCannonRect.colliderect(bullet)):
 
                 # if the right cannon is not dead 
                 if (self.rightCannonHP > 0):
 
-		    #decrease its health by one 
+            #decrease its health by one 
                     self.rightCannonHP -= 1
 
-		    #indicate it has been hit 
+            #indicate it has been hit 
                     rightCannonHit = True
 
-		    #kill the bullet that hit it 
+            #kill the bullet that hit it 
                     bullet.kill()
 
-	    # if any bullet collides with the left cannon
+        # if any bullet collides with the left cannon
             if (self.leftCannonRect.colliderect(bullet)):
 
-		# if the left cannon is not dead 
+        # if the left cannon is not dead 
                 if (self.leftCannonHP > 0):
 
-		    # decrease its health by one 
+            # decrease its health by one 
                     self.leftCannonHP -= 1
 
-		    # indicate it has been hit
+            # indicate it has been hit
                     leftCannonHit = True
 
-		    # kill the bullet that hit it 
+            # kill the bullet that hit it 
                     bullet.kill()
 
-	# if the left cannon is dead, play its death animation
+    # if the left cannon is dead, play its death animation
         if (self.leftCannonHP <= 0):
             screen.blit(brokenGun[count // 6], self.leftCannonRect)
             if (self.hitDelay >= 0):
@@ -1159,7 +1159,7 @@ class Boss(pygame.sprite.Sprite):
                 screen.blit(explosion[count // 6], \
                             (self.leftCannonRect.x - 20, self.leftCannonRect.y))
                 
-	# if the right cannon is dead, play its death animation
+    # if the right cannon is dead, play its death animation
         if (self.rightCannonHP <= 0):
             screen.blit(brokenGun[count // 6], self.rightCannonRect)
             if (self.hitDelay2 >= 0):
@@ -1167,7 +1167,7 @@ class Boss(pygame.sprite.Sprite):
                 screen.blit(explosion[count // 6], \
                             (self.rightCannonRect.x - 20, self.rightCannonRect.y))
 
-	# if both of the cannons are dead, stop the attacks and spawn in the final hit point 
+    # if both of the cannons are dead, stop the attacks and spawn in the final hit point 
         if (self.leftCannonHP == 0 and self.rightCannonHP == 0):
             self.attack = 0
             self.wait = 0 
@@ -1177,25 +1177,25 @@ class Boss(pygame.sprite.Sprite):
     def finalHitPointCollision(self):
         global finalHitPointHit
         
-	# for every bullet created by the player that is on the screen
+    # for every bullet created by the player that is on the screen
         for bullet in bullets:
 
-	    # if the bullets collide with the hitpoint and the hitpoint's health is greater than zero
+        # if the bullets collide with the hitpoint and the hitpoint's health is greater than zero
             if ((self.finalHitpointRect.colliderect(bullet)) and (self.finalHitpointHP > 0)):
 
-		# blit the damaged skull sprite to its rectangle
+        # blit the damaged skull sprite to its rectangle
                 screen.blit(pygame.image.load('sprites/Enemies/Boss_SkullHit.png'), self.rect)
 
-		# decrease the final hitpoint hp by one 
+        # decrease the final hitpoint hp by one 
                 self.finalHitpointHP -= 1
 
-		# indicate that the final hit point has been hit 
+        # indicate that the final hit point has been hit 
                 finalHitPointHit = True
 
-		# kill the bullet that hit it 
+        # kill the bullet that hit it 
                 bullet.kill()
         
-	# if the final hitpoint is dead, have the death animation play
+    # if the final hitpoint is dead, have the death animation play
         if (self.finalHitpointHP <= 0):
             screen.blit(brokenSkull[count // 6], self.rect)
             if (self.hitDelay3 >= 0):
@@ -1208,38 +1208,38 @@ class Boss(pygame.sprite.Sprite):
                             (random.randint(0, 400), random.randint(0, 100)))
             else:
 
-		# then promplty kill it 
+        # then promplty kill it 
                 self.kill()
 
     # function that executes a splash shooting attack
     def splashAttack(self):
 
-	    # have a waiting period before the attack happens 
+        # have a waiting period before the attack happens 
             self.splashWait += 1
             
-	    # once the delay has reached a certain value, then shoot
+        # once the delay has reached a certain value, then shoot
             if (self.splashWait >= 149):
 
-		# if the attack delay has not reached a certain value 
+        # if the attack delay has not reached a certain value 
                 if (self.splash < 99):
                     enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx - 4, self.leftCannonRect.top + self.leftCannonRect.height - 10, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
                     enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx - 4, self.leftCannonRect.top + self.leftCannonRect.height - 10, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))
                     enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 10, 10, 20, random.randint(0, 2), random.uniform(3.5, 7.5))
                     enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 10, 10, 20, random.randint(-2, 0), random.uniform(3.5, 7.5))        
                     
-		    # have the left cannon shoot even if the right cannon is dead 
+            # have the left cannon shoot even if the right cannon is dead 
                     if (self.leftCannonHP > 0 and self.rightCannonHP <= 0 and count % 3 == 0):
                         enemyBullets.add(enemyBullet1, enemyBullet2)
 
-		    # have the right cannon shoot even if the left cannon is dead 
+            # have the right cannon shoot even if the left cannon is dead 
                     elif (self.rightCannonHP > 0 and self.leftCannonHP <= 0 and count % 3 == 0):
                         enemyBullets.add(enemyBullet3, enemyBullet4)
 
-		    # if neither of them are dead, then have both of the cannons shoot 
+            # if neither of them are dead, then have both of the cannons shoot 
                     elif (count % 3 == 0):
                         enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4)
                         
-		    # increase the attack time delay
+            # increase the attack time delay
                     self.splash += 1
 
                 else:
@@ -1251,10 +1251,10 @@ class Boss(pygame.sprite.Sprite):
     # function that executes a basic spray attack
     def sprayAttack(self):
 
-	# increase the shot delay 
+    # increase the shot delay 
         self.sprayShootDelay += 1
 
-	# if the left cannon delay is less than 99 and the left cannon is not dead 
+    # if the left cannon delay is less than 99 and the left cannon is not dead 
         if (self.leftSpray < 99 and self.leftCannonHP > 0):
 
             # if the shooting delay is divisble by ten, then shoot 
@@ -1268,23 +1268,22 @@ class Boss(pygame.sprite.Sprite):
                 enemyBullet7 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 6, 5)            
                 enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
 
-	    # increasing the delay of the left cannon shooting 
+        # increasing the delay of the left cannon shooting 
             self.leftSpray += 1
 
-	# if the left cannon's shooting delay has reached a certain value, have the right cannon shoot if it is not dead
-        elif ((self.leftSpray >= 99 and self.rightSpray < 99 and self.rightCannonHP > 0) or (self.rightSpray < 99 and self.rightCannonHP > 0)):
+    # if the left cannon's shooting delay has reached a certain value, have the right cannon shoot if it is not dead
+        elif ((self.leftSpray >= 99 and self.rightSpray < 200 and self.rightCannonHP > 0) or (self.rightSpray < 99 and self.rightCannonHP > 0)):
 
-	    # once the shooting delay reaches 200 and is divisible by ten, then shoot 
-            if ((self.sprayShootDelay > 200) and (self.sprayShootDelay % 10 == 0)):
-
-                enemyBullet1 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, 0, 5)
-                enemyBullet2 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -1, 5)    
-                enemyBullet3 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -2, 5)    
-                enemyBullet4 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -3, 5)    
-                enemyBullet5 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -4, 5)    
-                enemyBullet6 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -5, 5)
-                enemyBullet7 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -6, 5)            
-                enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4, enemyBullet5, enemyBullet6, enemyBullet7)
+        # once the shooting delay reaches 200 and is divisible by ten, then shoot 
+            if (self.sprayShootDelay % 10 == 0) and (self.sprayShootDelay > 200):
+                enemyBullet8 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, 0, 5)
+                enemyBullet9 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -1, 5)    
+                enemyBullet10 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -2, 5)    
+                enemyBullet11 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -3, 5)    
+                enemyBullet12 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -4, 5)    
+                enemyBullet13 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -5, 5)
+                enemyBullet14 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -6, 5)            
+                enemyBullets.add(enemyBullet8, enemyBullet9, enemyBullet10, enemyBullet11, enemyBullet12, enemyBullet13, enemyBullet14)
             self.rightSpray += 1
 
         else:
@@ -1297,43 +1296,43 @@ class Boss(pygame.sprite.Sprite):
     # function that executes a circular shooting attack
     def circularAttack(self):
 
-	# set the value for the angle to be shot at 
+    # set the value for the angle to be shot at 
         angle = 20
 
-	# increase the shot delay 
+    # increase the shot delay 
         self.circularDelay += 1
 
-	# if the right cannon delay is less than 99 and the right cannon is not dead 
+    # if the right cannon delay is less than 99 and the right cannon is not dead 
         if (self.rightCircular < 99 and self.rightCannonHP > 0):
 
-	    # once the shot delay is divisible by ten, then shoot 
+        # once the shot delay is divisible by ten, then shoot 
             if (self.circularDelay % 10 == 0):
 
-		# create twelve bullets and increment the angle by twenty each time a bullet is shot
+        # create twelve bullets and increment the angle by twenty each time a bullet is shot
                 for x in range (12):
                     enemyBullet = EnemyCircularBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.centery + (self.rightCannonRect.height / 2) - 10, 10, 20, angle)
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
 
-	    # increase the delay of the right cannon shooting 
+        # increase the delay of the right cannon shooting 
             self.rightCircular += 1
 
-	# if the right cannon's shooting delay has reached a certain value, have the left cannon shoot if it is not dead 
+    # if the right cannon's shooting delay has reached a certain value, have the left cannon shoot if it is not dead 
         elif ((self.rightCircular >= 99 and self.leftCircular < 99 and self.leftCannonHP > 0) or (self.leftCircular < 99 and self.leftCannonHP > 0)): 
 
-	    # setting the angle back to twenty 
+        # setting the angle back to twenty 
             angle = 20
 
-	    # once the shot delay is divisible by ten, then shoot 
+        # once the shot delay is divisible by ten, then shoot 
             if (self.circularDelay % 10 == 0):
 
-		# create twelve bullets and increment the angle by twenty each time a bullet is shot
+        # create twelve bullets and increment the angle by twenty each time a bullet is shot
                 for x in range (12):
                     enemyBullet = EnemyCircularBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.centery + (self.leftCannonRect.height / 2) - 8, 10, 20, angle)
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
             
-	    # increase the delay of the left cannon shooting 
+        # increase the delay of the left cannon shooting 
             self.leftCircular += 1
 
         else:
@@ -1346,7 +1345,7 @@ class Boss(pygame.sprite.Sprite):
     # function that will execute a rotating shooting attack
     def rotatingAttack(self, screen):
 
-	# start incrementing the delay 
+    # start incrementing the delay 
         self.rotatingDelay += 5
 
         # the direction of the cannon
@@ -1435,19 +1434,19 @@ class Boss(pygame.sprite.Sprite):
             self.rightCannonAngleSpeed *= -1
             self.rotateCount += 1
 
-	# if it has rotated 90 degress twice and its angle is zero
+    # if it has rotated 90 degress twice and its angle is zero
         if (self.rotateCount == 2) and (self.angle >= 0):
 
-	    # if the left cannon is not dead 
+        # if the left cannon is not dead 
             if (self.leftCannonHP > 0):
 
-		# have the left cannon be equal to its previously made copy 
+        # have the left cannon be equal to its previously made copy 
                 self.leftCannon = self.leftCannonCopy
 
-	    # if the right cannon is not dead 
+        # if the right cannon is not dead 
             if (self.rightCannonHP > 0):
 
-		# have the right cannon be equal to its previously made copy 
+        # have the right cannon be equal to its previously made copy 
                 self.rightCannon = self.rightCannonCopy
 
             self.rotateCount = 0
@@ -1718,7 +1717,7 @@ def game():
     running = True
 
     # select the beginning level(default is 1 to play the full game)
-    level = 7
+    level = 9
 
     pygame.mixer.music.play(-1)
 
@@ -1740,8 +1739,8 @@ def game():
                 
                 toggleButton = ToggleButton(toggleStraight[0])
 
-                if (player.alive()):
-                    shootTime += 1
+                #if (player.alive()):
+                    #shootTime += 1
 
                 if (shootTime == 10):
                     player.shoot()
@@ -1765,11 +1764,13 @@ def game():
                             if ((within(pos[0], *joystick.x_boundary)
                                 and within(pos[1], *joystick.y_boundary))):
                                 selected = True
+
                             # toggle from straight shot to V shot
                             if (toggleButton.clicked() and Player.straightShot == True):
                                 buttonSound.play()
                                 Player.straightShot = False
                                 Player.vShot = True
+
                             # toggle from V shot to straight shot
                             elif (toggleButton.clicked() and Player.vShot == True):
                                 buttonSound.play()
