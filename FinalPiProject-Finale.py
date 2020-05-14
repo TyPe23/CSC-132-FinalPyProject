@@ -123,14 +123,19 @@ class Player(pygame.sprite.Sprite):
         if (self.rect.bottom < HEIGHT - 150):
             self.spawn = True
 
+
     # if the player is not hit check for collision
-        #if (Player.hit == False):
-            #self.checkCollision()
+        if (Player.hit == False):
+            self.checkCollision()
             
-        
     # else have a delay before checking collision again
-        #else:
-            #self.iFrame()
+        else:
+            self.iFrame()
+
+        if (self.alive() == False):
+            Player.hit = False
+            Player.straightShot = True
+            Player.vShot = False
 
         #pygame.draw.rect(screen, (255, 0, 0), self.rect)
         
@@ -1041,7 +1046,7 @@ class Boss(pygame.sprite.Sprite):
             if (self.wait == 100):
 
         # choose one of the four attacks randomly 
-                attack = 2 #random.randint(1, 4)
+                attack = random.randint(1, 4)
                 
         # if the attack chosen is the same as the previous attack
                 if (attack == self.oldAttack):
@@ -1530,12 +1535,6 @@ health = [pygame.image.load("sprites/Misc/Fuel_Cell_Empty.png"), pygame.image.lo
           pygame.image.load("sprites/Misc/Fuel_Cell6.png"), pygame.image.load("sprites/Misc/Fuel_Cell7.png"), pygame.image.load("sprites/Misc/Fuel_Cell8.png"), \
           pygame.image.load("sprites/Misc/Fuel_Cell9.png"), pygame.image.load("sprites/Misc/Fuel_Cell_Full.png")]
 
-# list that will hold all bullet objects
-bullets = pygame.sprite.Group()
-
-# list that will hold all enemy bullet objects 
-enemyBullets = pygame.sprite.Group()
-
 # sprites
 Ship = pygame.image.load("sprites/Player/Player_Ship.png")
 Ship2 = pygame.image.load("sprites/Player/Player_Ship2.png")
@@ -1557,53 +1556,9 @@ char = [Ship, Ship2]
 charLeft = [Left, Left2]
 charRight = [Right, Right2]
 
-# list that will contain the player object
-playerObj = pygame.sprite.Group()
-
-# creating player object 
-player = Player(char, WIDTH / 2 - 20, HEIGHT + 100, 35, 40, 10)
-playerObj.add(player)
-
 # creating sprite group for the enemies
 enemies = pygame.sprite.Group()
 enemySprites = [kamikaze, normal, spray, healer]
-
-# creating level system
-levelOne = pygame.sprite.Group()
-levelOne.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-
-levelTwo = pygame.sprite.Group()
-levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-
-levelThree = pygame.sprite.Group()
-levelThree.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
-
-levelFour = pygame.sprite.Group()
-levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelFour.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
-
-levelFive = pygame.sprite.Group()
-levelFive.add((SplashEnemy(enemySprites[2], 60, 0, 6)))
-
-levelSix = pygame.sprite.Group()
-levelSix.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelSix.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelSix.add((SplashEnemy(enemySprites[2], 60, 0, 6)))
-
-levelSeven = pygame.sprite.Group()
-levelSeven.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelSeven.add(EvadingEnemy(enemySprites[3], 30, 5, 5, player))
-
-levelEight = pygame.sprite.Group()
-levelEight.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelEight.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-levelEight.add(EvadingEnemy(enemySprites[3], 30, 5, 5, player))
-
-bossLevel = pygame.sprite.Group()
-bossLevel.add(Boss(100))
 
 # background
 bg = pygame.image.load("sprites/Misc/City_Background.png")
@@ -1706,6 +1661,58 @@ def game():
     global bgCount2
     global dt
     global boss
+    global enemyBullets
+    global bullets
+
+    # list that will hold all bullet objects
+    bullets = pygame.sprite.Group()
+
+    # list that will hold all enemy bullet objects 
+    enemyBullets = pygame.sprite.Group()
+
+    # list that will contain the player object
+    playerObj = pygame.sprite.Group()
+
+    # creating player object 
+    player = Player(char, WIDTH / 2 - 20, HEIGHT + 100, 35, 40, 10)
+    playerObj.add(player)
+
+    # creating level system
+    levelOne = pygame.sprite.Group()
+    levelOne.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+
+    levelTwo = pygame.sprite.Group()
+    levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+
+    levelThree = pygame.sprite.Group()
+    levelThree.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
+
+    levelFour = pygame.sprite.Group()
+    levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelFour.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
+
+    levelFive = pygame.sprite.Group()
+    levelFive.add((SplashEnemy(enemySprites[2], 60, 0, 6)))
+
+    levelSix = pygame.sprite.Group()
+    levelSix.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelSix.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelSix.add((SplashEnemy(enemySprites[2], 60, 0, 6)))
+
+    levelSeven = pygame.sprite.Group()
+    levelSeven.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelSeven.add(EvadingEnemy(enemySprites[3], 30, 5, 5, player))
+
+    levelEight = pygame.sprite.Group()
+    levelEight.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelEight.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
+    levelEight.add(EvadingEnemy(enemySprites[3], 30, 5, 5, player))
+
+    bossLevel = pygame.sprite.Group()
+    bossLevel.add(Boss(100))
 
     # will count the delay between each shot
     shootTime = 0
@@ -1717,7 +1724,10 @@ def game():
     running = True
 
     # select the beginning level(default is 1 to play the full game)
-    level = 9
+    level = 1
+
+    # variable that checks whether or not the game is over 
+    gameOver = False
 
     pygame.mixer.music.play(-1)
 
@@ -1739,8 +1749,8 @@ def game():
                 
                 toggleButton = ToggleButton(toggleStraight[0])
 
-                #if (player.alive()):
-                    #shootTime += 1
+                if (player.alive()):
+                    shootTime += 1
 
                 if (shootTime == 10):
                     player.shoot()
@@ -1828,8 +1838,8 @@ def game():
                 if (level == 1):
                     levelOne.draw(screen)
                     levelOne.update(screen)
-                    if (player.hp < 10):
-                        player.hp += 1
+                    #if (player.hp < 10):
+                        #player.hp += 1
 
                 elif (level == 2):
                     levelTwo.draw(screen)
@@ -1841,7 +1851,6 @@ def game():
                     if (player.hp < 8):
                         player.hp += 1
                     
-
                 elif (level == 4):
                     levelFour.draw(screen)
                     levelFour.update(screen)
@@ -1877,22 +1886,24 @@ def game():
                 # drawing and refreshing the bullets list to check for any action in bullet object
                 bullets.update(screen, bulletImg)
                 bullets.draw(screen)
-
-                # blit the UI
-                # joystick
-                screen.blit(joystick.image, joystick.rect)
-
-                # arrows
-                screen.blit(rightImg, (stickX + 20, stickY - 15))
-                screen.blit(leftImg, (stickX - 55, stickY - 15))
-                screen.blit(upImg, (stickX - 15, stickY - 55))
-                screen.blit(downImg, (stickX - 15, stickY + 20))
-
-                # toggle
-                toggleButton.update(screen)
                 
-                # health bar
-                screen.blit(health[player.hp], (stickX, stickY - 300))
+                if (gameOver == False):
+                
+                    # health bar
+                    screen.blit(health[player.hp], (stickX, stickY - 300))
+
+                    # blit the UI
+                    # joystick
+                    screen.blit(joystick.image, joystick.rect)
+
+                    # arrows
+                    screen.blit(rightImg, (stickX + 20, stickY - 15))
+                    screen.blit(leftImg, (stickX - 55, stickY - 15))
+                    screen.blit(upImg, (stickX - 15, stickY - 55))
+                    screen.blit(downImg, (stickX - 15, stickY + 20))
+
+                    # toggle
+                    toggleButton.update(screen)
 
                 # if the player is alive display the proper animation
                 if (player.alive()):
@@ -1929,6 +1940,15 @@ def game():
                     # reset the left and right values to false
                     left = False
                     right = False
+
+                else:
+                    gameOver = True
+                    gameOverButton = StartButton(startButtonImg)
+                    gameOverButton.update(screen)
+
+                    if gameOverButton.clicked():
+                        running = False
+                        menu()
                 
                 if len(levelOne) <= 0:
                     level = 2
@@ -1952,7 +1972,21 @@ def game():
                     level = 8
 
                 if len(levelEight) <= 0:
+
+                    if player.hp < 4:
+                        player.hp = 4
+                        
                     level = 9
+
+                if len(bossLevel) <= 0:
+                    gameOver = True
+                    victoryButton = StartButton(startButtonImg)
+                    victoryButton.update(screen)
+                    player.hp = 0 
+
+                    if victoryButton.clicked():
+                        running = False
+                        menu()
 
                 # update the display
                 pygame.display.update()
