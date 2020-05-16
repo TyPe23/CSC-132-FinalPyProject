@@ -59,6 +59,44 @@ class StartButton(Button):
         else:
             screen.blit(self.sprite, self.rect)
 
+# class that creates start button for the menu (inherits from Button class)
+class VictoryButton(Button):
+    def __init__(self, sprite):
+        Button.__init__(self, points = None, width = 327, height = 174, x = WIDTH / 6, y = HEIGHT / 3)
+        self.sprite = sprite
+
+    # updates collision detection
+    def update(self, screen):
+
+        mouse_pos = pygame.mouse.get_pos()
+
+    # if the mouse is over the start button then shade it 
+        if (self.rect.collidepoint(mouse_pos)):
+            screen.blit(victoryButton2, self.rect)
+
+    # else do not shade it 
+        else:
+            screen.blit(self.sprite, self.rect)
+
+# class that creates start button for the menu (inherits from Button class)
+class GameOverButton(Button):
+    def __init__(self, sprite):
+        Button.__init__(self, points = None, width = 243, height = 216, x = WIDTH / 4, y = HEIGHT / 3)
+        self.sprite = sprite
+
+    # updates collision detection
+    def update(self, screen):
+
+        mouse_pos = pygame.mouse.get_pos()
+
+    # if the mouse is over the start button then shade it 
+        if (self.rect.collidepoint(mouse_pos)):
+            screen.blit(gameOverButton2, self.rect)
+
+    # else do not shade it 
+        else:
+            screen.blit(self.sprite, self.rect)
+
 # class that creates toggle button for gameplay (inherits from Button class)
 class ToggleButton(Button):
     def __init__(self, sprite):
@@ -197,7 +235,7 @@ class Player(pygame.sprite.Sprite):
 
     # function that creates a bullet object 
     def shoot(self):
-        #bulletSound.play()
+        bulletSound.play()
         
     # shoot in a straight line if straightShot is true
         if ((self.rect.bottom <= HEIGHT - 30) and (Player.straightShot == True)):
@@ -544,7 +582,7 @@ class Enemy(pygame.sprite.Sprite):
         if (self.hp <= 0):
 
             # play explosion sound
-            #explosionSound.play()
+            explosionSound.play()
 
         #start the decrementing the hit delay 
             self.hitDelay -= 1
@@ -658,7 +696,7 @@ class NormalEnemy(Enemy):
 
     # if the random number generated is 0 and it is alive then shoot  
         if (random.randrange(20) == 0 and self.alive() == True):
-            #enemyBulletSound.play()
+            enemyBulletSound.play()
             enemyBullet = EnemyBullet(self.rect.centerx, self.rect.top + self.rect.height, 10, 20, 0, 6)
             enemyBullets.add(enemyBullet)
 
@@ -712,7 +750,7 @@ class SplashEnemy(Enemy):
 
         # if it is alive then shoot 
         if ((self.alive() == True) and count % 3 == 0):
-            #enemyBulletSound.play()
+            enemyBulletSound.play()
             enemyBullet1 = EnemyBullet(self.rect.centerx + 23, self.rect.top + self.rect.height, 10, 20, random.randint(1, 2), random.uniform(3.5, 7.5))
             enemyBullet2 = EnemyBullet(self.rect.centerx - 35, self.rect.top + self.rect.height, 10, 20, random.randint(-2, -1), random.uniform(3.5, 7.5))
             enemyBullets.add(enemyBullet1, enemyBullet2)
@@ -1105,7 +1143,7 @@ class Boss(pygame.sprite.Sprite):
         
             # having the untouchable cannons shoot after a certain amount of time
             if ((self.untouchableCannonDelay % 50 == 0) and ((self.rightCannonHP > 0) or (self.leftCannonHP > 0)) and self.attack != 1):
-                #untouchableBulletSound.play()
+                untouchableBulletSound.play()
                 enemyBullet1 = EnemyCircularBullet2(153, 60, 10, 20, -90)
                 enemyBullet2 = EnemyCircularBullet2(153, 60, 10, 20, -110)
                 enemyBullet3 = EnemyCircularBullet2(153, 60, 10, 20, -70)
@@ -1185,6 +1223,7 @@ class Boss(pygame.sprite.Sprite):
             screen.blit(brokenGun[count // 6], self.leftCannonRect)
             if (self.hitDelay >= 0):
                 self.hitDelay -= 1
+                explosionSound.play()
                 screen.blit(explosion[count // 6], \
                             (self.leftCannonRect.x - 20, self.leftCannonRect.y))
                 
@@ -1193,6 +1232,7 @@ class Boss(pygame.sprite.Sprite):
             screen.blit(brokenGun[count // 6], self.rightCannonRect)
             if (self.hitDelay2 >= 0):
                 self.hitDelay2 -= 1
+                explosionSound.play()
                 screen.blit(explosion[count // 6], \
                             (self.rightCannonRect.x - 20, self.rightCannonRect.y))
 
@@ -1215,6 +1255,9 @@ class Boss(pygame.sprite.Sprite):
         # blit the damaged skull sprite to its rectangle
                 screen.blit(pygame.image.load('sprites/Enemies/Boss_SkullHit.png'), self.rect)
 
+        # play the hit sound
+                hitSound.play()
+
         # decrease the final hitpoint hp by one 
                 self.finalHitpointHP -= 1
 
@@ -1229,6 +1272,7 @@ class Boss(pygame.sprite.Sprite):
             screen.blit(brokenSkull[count // 6], self.rect)
             if (self.hitDelay3 >= 0):
                 self.hitDelay3 -= 1
+                explosionSound.play()
                 screen.blit(explosion[count // 6], \
                             (self.leftCannonRect.x - 20, self.leftCannonRect.y))
                 screen.blit(explosion[count // 6], \
@@ -1258,17 +1302,17 @@ class Boss(pygame.sprite.Sprite):
                     
             # have the left cannon shoot even if the right cannon is dead 
                     if (self.leftCannonHP > 0 and self.rightCannonHP <= 0 and count % 3 == 0):
-                        #enemyBulletSound.play()
+                        enemyBulletSound.play()
                         enemyBullets.add(enemyBullet1, enemyBullet2)
 
             # have the right cannon shoot even if the left cannon is dead 
                     elif (self.rightCannonHP > 0 and self.leftCannonHP <= 0 and count % 3 == 0):
-                        #enemyBulletSound.play()
+                        enemyBulletSound.play()
                         enemyBullets.add(enemyBullet3, enemyBullet4)
 
             # if neither of them are dead, then have both of the cannons shoot 
                     elif (count % 3 == 0):
-                        #enemyBulletSound.play()
+                        enemyBulletSound.play()
                         enemyBullets.add(enemyBullet1, enemyBullet2, enemyBullet3, enemyBullet4)
                         
             # increase the attack time delay
@@ -1291,7 +1335,7 @@ class Boss(pygame.sprite.Sprite):
 
             # if the shooting delay is divisble by ten, then shoot 
             if (self.sprayShootDelay % 10 == 0):
-                #enemyBulletSound.play()
+                enemyBulletSound.play()
                 enemyBullet1 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 0, 5)
                 enemyBullet2 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 1, 5)    
                 enemyBullet3 = EnemyBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.top + self.leftCannonRect.height - 5, 10, 20, 2, 5)    
@@ -1309,7 +1353,7 @@ class Boss(pygame.sprite.Sprite):
 
         # once the shooting delay reaches 200 and is divisible by ten, then shoot 
             if (self.sprayShootDelay % 10 == 0) and (self.sprayShootDelay > 200):
-                #enemyBulletSound.play()
+                enemyBulletSound.play()
                 enemyBullet8 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, 0, 5)
                 enemyBullet9 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -1, 5)    
                 enemyBullet10 = EnemyBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.top + self.rightCannonRect.height - 7, 10, 20, -2, 5)    
@@ -1344,7 +1388,7 @@ class Boss(pygame.sprite.Sprite):
 
         # create twelve bullets and increment the angle by twenty each time a bullet is shot
                 for x in range (12):
-                    #enemyBulletSound.play()
+                    enemyBulletSound.play()
                     enemyBullet = EnemyCircularBullet(self.rightCannonRect.centerx - 4, self.rightCannonRect.centery + (self.rightCannonRect.height / 2) - 10, 10, 20, angle)
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
@@ -1363,7 +1407,7 @@ class Boss(pygame.sprite.Sprite):
 
         # create twelve bullets and increment the angle by twenty each time a bullet is shot
                 for x in range (12):
-                    #enemyBulletSound.play()
+                    enemyBulletSound.play()
                     enemyBullet = EnemyCircularBullet(self.leftCannonRect.centerx - 2, self.leftCannonRect.centery + (self.leftCannonRect.height / 2) - 8, 10, 20, angle)
                     enemyBullets.add(enemyBullet)
                     angle -= 20 if angle <= 140 else 140
@@ -1425,7 +1469,7 @@ class Boss(pygame.sprite.Sprite):
 
             # the delay between each shot
             if (self.rotatingDelay % 40 == 0):
-                #enemyBulletSound.play()
+                enemyBulletSound.play()
                 enemyBullet = EnemyRotatingBullet(bulletImg, 10, 20, rightPos, direction.normalize(), 20) 
                 enemyBullets.add(enemyBullet)
 
@@ -1457,7 +1501,7 @@ class Boss(pygame.sprite.Sprite):
 
             # the delay between each shot
             if (self.rotatingDelay % 40 == 0):
-                #enemyBulletSound.play()
+                enemyBulletSound.play()
                 enemyBullet = EnemyRotatingBullet(bulletImg, 10, 20, leftPos, direction.normalize(), 20) 
                 enemyBullets.add(enemyBullet)
 
@@ -1562,6 +1606,10 @@ brokenSkull = [pygame.image.load("sprites/Enemies/Boss_Skull_Broken.png"), pygam
 # loading in the start images
 startButtonImg = pygame.image.load('sprites/Misc/FinalPi2.png')
 selectedStartButtonImg = pygame.image.load('sprites/Misc/FinalPi.png')
+victoryButton = pygame.image.load('sprites/Misc/Victory.png')
+victoryButton2 = pygame.image.load('sprites/Misc/Victory2.png')
+gameOverButton = pygame.image.load('sprites/Misc/GameOver.png')
+gameOverButton2 = pygame.image.load('sprites/Misc/GameOver2.png')
 toggleStraight = [pygame.image.load('sprites/Toggle/Toggel.png'), pygame.image.load('sprites/Toggle/Toggel2.png')]
 toggleWide = [pygame.image.load('sprites/Toggle/Toggel3.png'), pygame.image.load('sprites/Toggle/Toggel4.png')]
 health = [pygame.image.load("sprites/Misc/Fuel_Cell_Empty.png"), pygame.image.load("sprites/Misc/Fuel_Cell1.png"), pygame.image.load("sprites/Misc/Fuel_Cell2.png"), \
@@ -1624,12 +1672,12 @@ toggleButton = Button(None, 56, 44, toggleX, toggleY)
 within = (lambda x, low, high: low <= x <= high)
 
 # sounds
-enemyBulletSound = pygame.mixer.Sound("Final Pi Music v.2/Sound Effects/bullet_sound_enemy_final.wav")
-bulletSound = pygame.mixer.Sound("Final Pi Music v.2/Sound Effects/untouchables_final.wav")
-untouchableBulletSound = pygame.mixer.Sound("Final Pi Music v.2/Sound Effects/untouchables_2_final.wav")
-hitSound = pygame.mixer.Sound("Final Pi Music v.2/Sound Effects/hit_sound_final.wav")
-explosionSound = pygame.mixer.Sound("Final Pi Music v.2/Sound Effects/explosion_final.wav")
-buttonSound = pygame.mixer.Sound("Final Pi Music v.2/Sound Effects/buttonPush_final.wav")
+enemyBulletSound = pygame.mixer.Sound("Final Pi Music v.3/Sound Effects/bullet_3_final.wav")
+bulletSound = pygame.mixer.Sound("Final Pi Music v.3/Sound Effects/bullet_5_final.wav")
+untouchableBulletSound = pygame.mixer.Sound("Final Pi Music v.3/Sound Effects/untouchables_final.wav")
+hitSound = pygame.mixer.Sound("Final Pi Music v.3/Sound Effects/hit_sound_final.wav")
+explosionSound = pygame.mixer.Sound("Final Pi Music v.3/Sound Effects/explosion_final.wav")
+buttonSound = pygame.mixer.Sound("Final Pi Music v.3/Sound Effects/buttonPush_final.wav")
 
 
 # function that handles the start menu 
@@ -1642,7 +1690,7 @@ def menu():
         
     startButton = StartButton(startButtonImg)
 
-    pygame.mixer.music.load("Final Pi Music v.2/Music Tracks/title_final.wav")
+    pygame.mixer.music.load("Final Pi Music v.3/Music Tracks/title_final.wav")
 
     pygame.mixer.music.play(-1)
 
@@ -1672,7 +1720,7 @@ def menu():
 
                 if (startButton.clicked()):
                     buttonSound.play()
-                    pygame.mixer.music.load("Final Pi Music v.2/Music Tracks/wave_final.wav")
+                    pygame.mixer.music.load("Final Pi Music v.3/Music Tracks/wave_final.wav")
                     menu = False
                     game()
                         
@@ -1698,6 +1746,7 @@ def game():
     global bgCount2
     global dt
     global boss
+    global gameOverMusic
     global enemyBullets
     global bullets
     global heal
@@ -1764,10 +1813,13 @@ def game():
     running = True
 
     # select the beginning level(default is 1 to play the full game)
-    level = 1
+    level = 9
 
     # variable that checks whether or not the game is over 
     gameOver = False
+
+    # variable that tracks if the game over music is playing
+    gameOverMusic = False
 
     pygame.mixer.music.play(-1)
 
@@ -1778,9 +1830,14 @@ def game():
     while (running == True):
 
         if (level == 10 and boss == False):
-            pygame.mixer.music.load("Final Pi Music v.2/Music Tracks/boss_final.wav")
+            pygame.mixer.music.load("Final Pi Music v.3/Music Tracks/boss_final.wav")
             pygame.mixer.music.play(-1)
             boss = True
+
+        if (gameOver == True and gameOverMusic == False and player.hp <= 0):
+            pygame.mixer.music.load("Final Pi Music v.3/Music Tracks/death_final.wav")
+            pygame.mixer.music.play(1)
+            gameOverMusic = True
 
         # Will add pause function later 
         if (paused == False):
@@ -1988,10 +2045,14 @@ def game():
 
                 else:
                     gameOver = True
-                    gameOverButton = StartButton(startButtonImg)
-                    gameOverButton.update(screen)
+                    if player.hp > 0:
+                        endButton = VictoryButton(victoryButton)
+                    else:
+                        endButton = GameOverButton(gameOverButton)
+                    endButton.update(screen)
 
-                    if gameOverButton.clicked():
+                    if endButton.clicked():
+                        buttonSound.play()
                         running = False
                         menu()
                 
@@ -2024,7 +2085,10 @@ def game():
 
                 if len(bossLevel) <= 0:
                     gameOver = True
-                    endButton = StartButton(startButtonImg)
+                    if player.hp > 0:
+                        endButton = VictoryButton(victoryButton)
+                    else:
+                        endButton = GameOverButton(gameOverButton)
                     endButton.update(screen)
 
                     if endButton.clicked():
