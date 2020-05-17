@@ -280,8 +280,23 @@ class Player(pygame.sprite.Sprite):
     # if the player hp is zero
         if (self.hp <= 0):
 
-        # kill the player 
-            self.kill()
+            # play explosion sound
+            explosionSound.play()
+
+        #start the decrementing the hit delay 
+            self.hitDelay += 1
+
+        # while the hit delay is not below zero
+            if (self.hitDelay <= 50):
+
+        #show the explosion animations 
+                screen.blit(explosion[count // 6], self.rect)
+
+        # once the delay reaches below zero 
+            else:
+
+        #kill itself
+                self.kill()
 
     # function to check if the player is alive 
     def alive(self):
@@ -299,7 +314,7 @@ class Player(pygame.sprite.Sprite):
         self.hitDelay += 1
         
     # once the delay reaches a certain value
-        if (self.hitDelay >= 250):
+        if (self.hitDelay >= 250 and self.hp > 0):
 
         # allow the player to check for collision again
             Player.hit = False
@@ -971,6 +986,54 @@ class KamikazeEnemy(Enemy):
     # always setting the default value of hit to be false 
         self.hit = False
 
+    def checkCollision(self):
+
+        if (pygame.sprite.collide_rect(self, self.player)):
+            player.hp = 0
+            self.hp = 0
+
+    # for every bullet that is created by the player and is on the screen
+        for bullet in bullets:
+
+        # if any of the bullets collide with the enemy
+            if (pygame.sprite.collide_rect(self, bullet)):
+
+        # if the enemy is not dead 
+                if (self.hp > 0):
+
+                    # play hit sound
+                    hitSound.play()
+
+            # decrease its health by one 
+                    self.hp -= 1
+
+            # indicate that it has been hit
+                    self.hit = True
+
+        # kill the bullet that hit it
+                bullet.kill()
+
+    # if the enemy is dead 
+        if (self.hp <= 0):
+
+            # play explosion sound
+            explosionSound.play()
+
+        #start the decrementing the hit delay 
+            self.hitDelay -= 1
+
+        # while the hit delay is not below zero
+            if (self.hitDelay >= 0):
+
+        #show the explosion animations 
+                screen.blit(explosion[count // 6], self.rect)
+
+        # once the delay reaches below zero 
+            else:
+
+        #kill itself
+                self.kill()
+
 # class that creates the boss 
 class Boss(pygame.sprite.Sprite):
 
@@ -984,6 +1047,8 @@ class Boss(pygame.sprite.Sprite):
         self.hitDelay = 50
         self.hitDelay2 = 50
         self.hitDelay3 = 200
+        self.attack = 0
+        self.attackSwitch = random.randint(0, 4)
 
         # creating left cannon
         self.leftCannon = pygame.image.load('sprites/Enemies/Boss_Gun.png')
@@ -1101,33 +1166,33 @@ class Boss(pygame.sprite.Sprite):
             if (self.wait == 100):
 
         # choose one of the four attacks randomly 
-                attack = random.randint(1, 4)
+                self.attackSwitch += 1 # random.randint(1, 4)
                 
         # if the attack chosen is the same as the previous attack
-                if (attack == self.oldAttack):
+                #if (self.attack == self.oldAttack):
                     
             # if the attack is four, have it be one
-                    if (attack == 4):
-                        self.attack = 1
+                if (self.attackSwitch == 5):
+                     self.attackSwitch = 1
 
             # have the attack be whatever the previous attack was plus one 
-                    else:
-                        self.attack = self.oldAttack + 1
+                else:
+                     self.attack += 1
 
-                elif (attack == 1):
+                if (self.attackSwitch == 1):
                     self.attack = 1
 
-                elif (attack == 2):
+                elif (self.attackSwitch == 2):
                     self.attack = 2
 
-                elif (attack == 3):
+                elif (self.attackSwitch == 3):
                     self.attack = 3
 
-                elif (attack == 4):
+                elif (self.attackSwitch == 4):
                     self.attack = 4
                 
         # keeping track of the attack happening 
-                self.oldAttack = self.attack
+                #self.oldAttack = self.attack
 
             if (self.attack == 1):
                 self.splashAttack()
@@ -1750,6 +1815,7 @@ def game():
     global enemyBullets
     global bullets
     global heal
+    global player
 
     # list that will hold all bullet objects
     bullets = pygame.sprite.Group()
@@ -1774,12 +1840,12 @@ def game():
     levelTwo.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
 
     levelThree = pygame.sprite.Group()
-    levelThree.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
+    levelThree.add(KamikazeEnemy(enemySprites[0], 60, 5, 5, player))
 
     levelFour = pygame.sprite.Group()
     levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
     levelFour.add((NormalEnemy(enemySprites[1], 30, random.randint(-6, 6), random.randint(-6, 6))))
-    levelFour.add(KamikazeEnemy(enemySprites[0], 40, 3, 3, player))
+    levelFour.add(KamikazeEnemy(enemySprites[0], 60, 5, 5, player))
 
     levelFive = pygame.sprite.Group()
     levelFive.add((SplashEnemy(enemySprites[2], 60, 0, 6)))
@@ -1822,9 +1888,6 @@ def game():
     gameOverMusic = False
 
     pygame.mixer.music.play(-1)
-
-##    if (level == 10):
-##        pygame.mixer.music.load("Final Pi Music/boss-1.wav")
 
     # main game loop
     while (running == True):
@@ -2033,12 +2096,6 @@ def game():
                     elif (right == True):
                         screen.blit(charRight[count // 6], (player.rect.x - 30, player.rect.y - 5))
 
-                    # reset the count to prevent errors from exceeding list length   
-                    if (count + 1 >= 12):
-                        count = 0
-                    # increment the count to display the next sprite in the lists
-                    count += 1
-
                     # reset the left and right values to false
                     left = False
                     right = False
@@ -2094,6 +2151,12 @@ def game():
                     if endButton.clicked():
                         running = False
                         menu()
+
+                # reset the count to prevent errors from exceeding list length   
+                if (count + 1 >= 12):
+                    count = 0
+                # increment the count to display the next sprite in the lists
+                count += 1
 
                 # update the display
                 pygame.display.update()
