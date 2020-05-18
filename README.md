@@ -11,10 +11,10 @@ In addition to fleshing out this page a bit futhur as things move on, we plan to
 ### Planned Improvements
 
 1. Options menu 
-  - adjusst volume of effects and music
-  - change bullet colors (player and enemy)
+    - adjusst volume of effects and music
+    - change bullet colors (player and enemy)
 2. Beastiary
-  - showcase of the various enemies with descriptions
+    - showcase of the various enemies with descriptions
 3. Levels
-  - more levels with better level design (not just all the enemies in one level)
-  - more enemies, including bosses
+    - more levels with better level design (not just all the enemies in one level)
+    - more enemies, including bosses
