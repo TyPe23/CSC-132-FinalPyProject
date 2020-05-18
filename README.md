@@ -1,8 +1,8 @@
-## Welcome to GitHub Pages
+## Welcome to FinalPi
 
-You can use the [editor on GitHub](https://github.com/TyPe23/CSC-132-FinalPyProject/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+FinalPi is a bullet-hell style game where you take place as a mech flying through the streets shooting down enemies.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+FinalPi was made as an end-of-course college freshman project in Louisiana Tech's Living With Cyber Program and was written by Joshua Bailey, Ty Pederson, and Kennedy Ford.
 
 ### Markdown
 
