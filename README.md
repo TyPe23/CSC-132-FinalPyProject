@@ -11,7 +11,7 @@ In addition to fleshing out this page a bit futhur as things move on, we plan to
 ### Planned Improvements
 
 1. Options menu 
-    - adjusst volume of effects and music
+    - adjust volume of effects and music
     - change bullet colors (player and enemy)
 2. Beastiary
     - showcase of the various enemies with descriptions
