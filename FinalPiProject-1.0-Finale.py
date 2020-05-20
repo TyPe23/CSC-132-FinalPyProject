@@ -1879,7 +1879,7 @@ def game():
     running = True
 
     # select the beginning level(default is 1 to play the full game)
-    level = 9
+    level = 1
 
     # variable that checks whether or not the game is over 
     gameOver = False
